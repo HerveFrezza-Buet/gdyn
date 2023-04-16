@@ -31,9 +31,6 @@ INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.pc
     	DESTINATION ${PKGCONFIG_INSTALL_DIR}
 	COMPONENT devel)
 
-
-$
-
 add_subdirectory(src)
 add_subdirectory(examples)
 add_subdirectory(doc)

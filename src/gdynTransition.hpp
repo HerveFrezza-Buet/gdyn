@@ -5,7 +5,7 @@
 #include <iostream>
 #include <tuple>
 
-#include <ds-specs.hpp>
+#include <gdynSpecs.hpp>
 
 namespace gdyn {
 

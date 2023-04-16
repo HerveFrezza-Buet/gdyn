@@ -6,10 +6,10 @@
 #include <optional>
 #include <functional>
 
-#include <ds-specs.hpp>
-#include <ds-transition.hpp>
+#include <gdynSpecs.hpp>
+#include <gdynTransition.hpp>
 
-namespace dyn {
+namespace gdyn {
   
   namespace iterators {
     

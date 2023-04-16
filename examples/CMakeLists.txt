@@ -11,7 +11,7 @@ foreach(f ${usage_examples})
   set_target_properties     (${exampleName} PROPERTIES LINKER_LANGUAGE CXX                      )
   set_target_properties     (${exampleName} PROPERTIES COMPILE_FLAGS   "${PROJECT_CFLAGS} -Wall")
   
-  target_include_directories(${exampleName} PUBLIC ${CMAKE_SOURCE_DIR}/src))
+  target_include_directories(${exampleName} PUBLIC ${CMAKE_SOURCE_DIR}/src)
 
   install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${exampleName}
     DESTINATION bin

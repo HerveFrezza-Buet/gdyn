@@ -11,7 +11,7 @@
 // See https://mariusbancila.ro/blog/2020/06/06/a-custom-cpp20-range-view/
 
 
-namespace dyn {
+namespace gdyn {
   namespace ranges  {
 
     // ########
@@ -89,9 +89,9 @@ namespace dyn {
      * current state.
      */
     template<std::ranges::input_range R,
-	     dyn::specs::system SYSTEM>
+	     specs::system SYSTEM>
     requires std::ranges::view<R> &&
-    dyn::specs::command_iterator<std::ranges::iterator_t<R>, typename SYSTEM::command_type>
+    specs::command_iterator<std::ranges::iterator_t<R>, typename SYSTEM::command_type>
     class orbit_view : public std::ranges::view_interface<orbit_view<R, SYSTEM>> {
     private:
       // from is the range we adapt to become an orbit.
@@ -119,7 +119,7 @@ namespace dyn {
       constexpr R base() &&      {return std::move(from);}
 
       // Here are the bounds of the range. Here, we use our terminal
-      // iterator type dyn::iterators::terminal_t as a sentinel.
+      // iterator type iterators::terminal_t as a sentinel.
       constexpr auto begin() const {
 	return iterators::orbit<SYSTEM,
 				std::ranges::iterator_t<R>,
@@ -184,7 +184,7 @@ namespace dyn {
      */
     template<std::ranges::input_range R>
     requires std::ranges::view<R> &&
-    dyn::specs::orbit_iterator<std::ranges::iterator_t<R>>
+    specs::orbit_iterator<std::ranges::iterator_t<R>>
     class transition_view : public std::ranges::view_interface<transition_view<R>> {
     private:
       R from {};

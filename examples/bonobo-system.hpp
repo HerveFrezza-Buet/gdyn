@@ -130,7 +130,7 @@ public:
 };
 
 // Let us check the ds concept.
-static_assert(dyn::specs::system<Bonobo>);
+static_assert(gdyn::specs::system<Bonobo>);
 
 // Here are some usefull prints
 
@@ -152,7 +152,7 @@ void print_orbit_point(const Bonobo::observation_type& observation, const std::o
   std::cout << std::endl;
 }
 
-void print_transition(const dyn::transition<Bonobo::observation_type, Bonobo::command_type> t, unsigned int& step) {
+void print_transition(const gdyn::transition<Bonobo::observation_type, Bonobo::command_type> t, unsigned int& step) {
   std::cout << std::setw(8) << (step++) << " : ["
 	    << std::get<0>(t.observation) << ", "
 	    << std::setw(3) << std::get<1>(t.observation)
