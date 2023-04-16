@@ -7,7 +7,7 @@
 #include <algorithm>
 
 #include <gdyn.hpp>
-#include "bonobo.hpp"
+#include "bonobo-system.hpp"
 
 
 #define NB_ORBITS 50
