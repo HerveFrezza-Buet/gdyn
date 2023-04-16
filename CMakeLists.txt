@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(cxsom) 
+project(gdyn) 
 
 SET(PACKAGE_VERSION "1.00")
 SET(PACKAGE_LICENSE "GPL")
