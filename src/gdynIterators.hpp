@@ -150,7 +150,7 @@ namespace gdyn {
 
     public:
 
-      using value_type = transition<observation_t<ORBIT_ITERATOR>, command_t<ORBIT_ITERATOR>>;
+      using value_type = gdyn::transition<observation_t<ORBIT_ITERATOR>, command_t<ORBIT_ITERATOR>>;
       
     private:
       
