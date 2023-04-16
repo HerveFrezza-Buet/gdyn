@@ -7,6 +7,5 @@
 #include <gdynTransition.hpp>
 
 /**
- * @example
- *
+ * @example bonobo-system.hpp
  */
