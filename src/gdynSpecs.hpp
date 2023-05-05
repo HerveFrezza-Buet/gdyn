@@ -33,7 +33,6 @@ namespace gdyn {
      */
     template<typename DYNAMICAL_SYSTEM>
     concept system =
-      std::default_initializable<DYNAMICAL_SYSTEM> &&
       requires {
       // Let us require nested types definitions.
       typename DYNAMICAL_SYSTEM::state_type;
