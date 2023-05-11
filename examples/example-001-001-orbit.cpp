@@ -14,7 +14,9 @@ int main(int argc, char* argv[]) {
   Bonobo simulator;
   unsigned int step;
   
-  // This illustrates the use of orbit view.  The tick(f) range
+  // This illustrates the use of orbit view.
+
+  //The tick(f) range
   // provides values iteratively, each one being obtained from a call
   // f(). This is very usefull for feeding the orbit with events.
   

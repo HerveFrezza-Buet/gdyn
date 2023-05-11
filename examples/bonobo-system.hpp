@@ -143,6 +143,15 @@ void print_start(const std::string& state, double reward) {
   std::cout << "Starting : " << state << ", " << std::setw(3) << reward << std::endl;
 }
 
+void print_terminal(const std::string& state, double reward) {
+  std::cout << "Terminal : " << state << ", " << std::setw(3) << reward << std::endl;
+}
+
+void print_current(const std::string& state, double reward) {
+  std::cout << "Current  : " << state << ", " << std::setw(3) << reward << std::endl;
+}
+
+
 void print_orbit_point(const Bonobo::observation_type& observation, const std::optional<Bonobo::command_type>& action, unsigned int& step) {
   std::cout << std::setw(8) << (step++) << " : "
 	    << std::get<0>(observation) << ", "
@@ -163,9 +172,4 @@ void print_transition(const gdyn::transition<Bonobo::observation_type, Bonobo::c
   if(t.next_command)
     std::cout << " ( -> " << *(t.next_command) << ')';
   std::cout << std::endl;
-}
-
-
-void print_terminal(const std::string& state, double reward) {
-  std::cout << "Terminal : " << state << ", " << std::setw(3) << reward << std::endl;
 }

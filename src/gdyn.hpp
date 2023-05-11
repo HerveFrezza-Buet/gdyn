@@ -26,6 +26,7 @@ limitations under the License.
 
 /**
  * @example bonobo-system.hpp
+ * @example example-001-000-system.cpp
  * @example example-001-001-orbit.cpp
  * @example example-001-002-controller.cpp
  * @example example-001-003-transitions.cpp

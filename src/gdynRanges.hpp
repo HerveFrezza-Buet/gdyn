@@ -43,13 +43,13 @@ namespace gdyn {
      * successive results of these calls.
      */
     template<std::regular_invocable F>
-    class tick {
+    class tick : public std::ranges::view_interface<tick<F>> {
     private:
       using stored_function_type = std::function<decltype(std::declval<F>()()) ()>;
       stored_function_type f;
     public:
 
-      tick()                       = default;
+      tick()                       = delete;
       tick(const tick&)            = default;
       tick& operator=(const tick&) = default;
       tick(tick&&)                 = default;
@@ -148,7 +148,7 @@ namespace gdyn {
     };
     
     // This enables template argument guessing. It only consists of a
-    // headear declaration ? Typing calls the right costructor ?
+    // headear declaration ? Typing calls the right constructor ?
     // It also apply all_t for compatibility with things like vectors, I guess.
     template<typename R, typename SYSTEM> orbit_view(R&&, SYSTEM&) -> orbit_view<std::ranges::views::all_t<R>, SYSTEM>;
 

@@ -62,7 +62,15 @@ namespace gdyn {
     
     using tick_type = ranges::tick<std::function<int ()>>;
     using tick_iterator_type = std::ranges::iterator_t<tick_type>;
+    static_assert(std::ranges::range<tick_type>);
     static_assert(std::ranges::input_range<tick_type>);
+
+    using T = tick_type;
+    static_assert(std::ranges::enable_view<tick_type>);
+    static_assert(std::ranges::view<tick_type>);
+    static_assert(std::ranges::viewable_range<tick_type>);
+
+    
     static_assert(std::input_iterator<tick_iterator_type>);
 
     

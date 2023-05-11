@@ -52,7 +52,7 @@ namespace gdyn {
       
     public:
       
-      tick()                       = default;
+      tick()                       = delete;
       tick(const tick&)            = default;
       tick& operator=(const tick&) = default;
       tick(tick&&)                 = default;
@@ -110,11 +110,11 @@ namespace gdyn {
     public:
       
       
-      orbit()                              = default;
-      orbit(const orbit&)                  = default;
-      orbit(orbit&&)                       = default;
-      orbit& operator=(const orbit& other) = default;
-      orbit& operator=(orbit&&      other) = default;
+      orbit()                        = delete;
+      orbit(const orbit&)            = default;
+      orbit(orbit&&)                 = default;
+      orbit& operator=(const orbit&) = default;
+      orbit& operator=(orbit&&     ) = default;
 
       orbit(SYSTEM& system, COMMAND_ITERATOR it, COMMAND_SENTINEL end)
 	: system(&system), it(it), end(end),
@@ -179,11 +179,11 @@ namespace gdyn {
       
       using difference_type = std::ptrdiff_t;
       
-      transition()                                   = default;
-      transition(const transition&)                  = default;
-      transition(transition&&)                       = default;
-      transition& operator=(const transition& other) = default;
-      transition& operator=(transition&&      other) = default;
+      transition()                             = delete;
+      transition(const transition&)            = default;
+      transition(transition&&)                 = default;
+      transition& operator=(const transition&) = default;
+      transition& operator=(transition&&     ) = default;
 
       transition(ORBIT_ITERATOR begin, ORBIT_SENTINEL end) : it(begin), end(end), value() {
 	if(it != end) {
