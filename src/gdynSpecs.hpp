@@ -59,8 +59,9 @@ namespace gdyn {
     template<typename CONTROLLER, typename OBSERVATION, typename COMMAND>
     concept controller =
       requires(CONTROLLER const constant_controller,
-	       OBSERVATION const constant_observation,
-	       COMMAND command) {command = constant_controller(constant_observation);};
+	       OBSERVATION const constant_observation) {
+      {constant_controller(constant_observation)} -> std::convertible_to<COMMAND>;
+    };
 
     /**
      * @short This specifies an iterator providing commands to a system.
