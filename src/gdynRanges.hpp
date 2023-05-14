@@ -74,11 +74,11 @@ namespace gdyn {
 
     /**
      * This provides a command from a controller, i.e. a function that
-     * computes a command from the cureent system observation.
+     * computes a command from the current system observation.
      */
     template<specs::system SYSTEM,
 	     specs::controller<typename SYSTEM::observation_type, typename SYSTEM::command_type> CONTROLLER>
-    auto controller(SYSTEM& system, const CONTROLLER& controller) {return tick([&system, &controller](){return controller(*system);});}
+    auto controller(SYSTEM& system, const CONTROLLER& controller) {return tick([&system, controller](){return controller(*system);});}
     
     
     // #########
