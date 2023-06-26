@@ -17,6 +17,8 @@
 // transition.
 
 struct adaptive_controller {
+// TODO : on peut faire des private dans struct ?
+// TODO : quel avantage / class ?
 private:
 
   // reward_average['BONOOB'] = {average reward when action 'B' is applied from state 'BONOON',
@@ -113,6 +115,8 @@ int main(int argc, char* argv[]) {
   while(true) {
     unsigned int step = 0;
     simulator = Bonobo::random_state(gen);
+    // TODO : gdyn::ranges::controller, pas vu avant. Défini où ?
+    // TODO : différence avec gdyn::ranges::ticks( f )
     for([[maybe_unused]] auto& unused
 	  : gdyn::ranges::controller(simulator, epsilon_greedy(gen, .1, greedy_controller))                              // We use the controller to feed an orbit.
 	  | gdyn::views::orbit(simulator)                                                                                // This is the orbit.
