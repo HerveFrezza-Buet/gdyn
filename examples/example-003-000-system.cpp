@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
 
   Cartpole simulator;
   
-  simulator = Cartpole::random_state(gen); // We set the state.
+  simulator = Cartpole::random_state(gen, simulator.param); // We set the state.
   auto [state, reward] = *simulator;     // We get the observation.
   print_context("start", state, reward);
 
@@ -47,11 +47,14 @@ int main(int argc, char* argv[]) {
   };
   std::tie(state, reward) = *simulator;
   print_context("start", state, reward);
-  // TODO or until termination
-  for(auto command
+
+  // change Simulator parameters
+  simulator.param.delta_time *= 5.0;
+
+    for(auto command
 	: gdyn::ranges::tick([&simulator, &policy](){return policy(std::get<0>(*simulator));})
 	| std::views::take(20)) {
-    simulator(command, 5.0*Cartpole::delta_default); // We apply the command to the system to trigger a state transition.
+    simulator(command); // We apply the command to the system to trigger a state transition.
     std::tie(state, reward) = *simulator;
     std::cout << command << " => " << Cartpole::to_string(state) << " (" << reward << ")." << std::endl;
   }

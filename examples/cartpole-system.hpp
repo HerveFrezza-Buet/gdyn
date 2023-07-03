@@ -12,30 +12,43 @@
 #include <gdyn.hpp>
 
 // Simulator of the cartpole.
-// I'd like to add a `delta_t` parameter to the `step` function.
+// A companion struct Parameters hold the various parameters/const of the Simulator.
 
-// This class fits the ds::specs::Simulator concept, and adds some
-// usefull features, specific to the BONOBO simulation.
+// This class fits the gdyn::specs::Simulator concept.
 
+// **************************************************************** Parameters
+struct Parameters {
 
+  // Physics
+  double gravity {9.81};
+  double mass_cart {1.0};
+  double mass_pole {0.1};
+  double mass_total {mass_cart + mass_pole};
+  double length_halfpole {0.5};
+  double lm_pole {mass_pole * length_halfpole};
+  double force_mag {10.0};
+
+  // Simulation engine
+  double delta_time {0.02};     // delta_time for update, in seconds
+
+  // Termination
+  double theta_threshold_rad {12.0 * 2.0 * std::numbers::pi / 360.0};
+  double x_threshold {2.4};
+
+  // Random State generation
+  double range_x {0.5};
+  double range_theta_rad {theta_threshold_rad / 2.0};
+
+}; // struct Parameters
+
+// ***************************************************************************
+// ****************************************************************** CartPole
+// ***************************************************************************
 class Cartpole {
 
 public:
-  // [Q] constants ?
-  // Physics
-  const double gravity {9.81};
-  const double mass_cart {1.0};
-  const double mass_pole {0.1};
-  const double mass_total {mass_cart + mass_pole};
-  const double length_halfpole {0.5};
-  const double lm_pole {mass_pole * length_halfpole};
-  const double force_mag {10.0};
-  static constexpr double delta_default {0.02};     // delta_time for update, in seconds
 
-  // Termination
-  static constexpr double theta_threshold_rad {12.0 * 2.0 * std::numbers::pi / 360.0};
-  static constexpr double x_threshold {2.4};
-
+  Parameters param;
 
   struct state_s {
     double x;
@@ -50,6 +63,7 @@ public:
     return sbuf.str();
   }
 
+  // for command
   enum class direction : int {L = 0, R = 1};
   static std::string to_string(const direction& d) {
     if (d == direction::L) {
@@ -74,11 +88,11 @@ public:
   }
 
   template<typename RANDOM_GENERATOR>
-  static state_type random_state(RANDOM_GENERATOR& gen) {
+  static state_type random_state(RANDOM_GENERATOR& gen, const Parameters& param) {
     state_type res;
-    res.x = (std::uniform_real_distribution<double>(0,1)(gen) * 2.0 - 1.0) * Cartpole::x_threshold;
+    res.x = (std::uniform_real_distribution<double>(0,1)(gen) * 2.0 - 1.0) * param.range_x;
     res.x_dot = 0.0;
-    res.theta = (std::uniform_real_distribution<double>(0,1)(gen) * 2.0 - 1.0) * Cartpole::theta_threshold_rad;
+    res.theta = (std::uniform_real_distribution<double>(0,1)(gen) * 2.0 - 1.0) * param.range_theta_rad;
     res.theta_dot = 0.0;
     return res;
   }
@@ -106,13 +120,13 @@ private:
   }
 
 public:
-  
+  // Constructor initialize Parameters
+  Cartpole()  : param(Parameters{}) {}
 
   // This is required by the gdyn::specs::system concept.
   // This is for initializing the state of the system.
   Cartpole& operator=(const state_type& init_state) {
     state = init_state;
-    // TODO reward = compute_reward();
     compute_reward();
     return *this;
   }
@@ -132,10 +146,10 @@ public:
   
   // This is required by the gdyn::specs::system concept.
   // This performs a state transition.
-  void operator()(command_type command, double delta_time=Cartpole::delta_default) {
-  // TODO void operator()(command_type command) {
-    // TODO double delta_time = delta_default;
-    double force {force_mag};
+  void operator()(command_type command) {
+
+    auto p = param;
+    double force {p.force_mag};
     if (command == direction::L) {
       force *= -1.0;
     }
@@ -143,24 +157,24 @@ public:
     auto theta = state.theta;
     double costheta = std::cos(theta);
     double sintheta = std::sin(theta);
-    double temp = (force + lm_pole * std::pow(state.theta_dot, 2) * sintheta) / mass_total;
-    double theta_acc = (gravity * sintheta - costheta * temp) /
-      (length_halfpole * (4.0 / 3.0 - mass_pole * std::pow(costheta, 2)) / mass_total);
-    double x_acc = temp - lm_pole * theta_acc * costheta / mass_total;
+    double temp = (force + p.lm_pole * std::pow(state.theta_dot, 2) * sintheta) / p.mass_total;
+    double theta_acc = (p.gravity * sintheta - costheta * temp) /
+      (p.length_halfpole * (4.0 / 3.0 - p.mass_pole * std::pow(costheta, 2)) / p.mass_total);
+    double x_acc = temp - p.lm_pole * theta_acc * costheta / p.mass_total;
 
-    state.x += delta_time * state.x_dot;
-    state.x_dot += delta_time * x_acc;
-    state.theta += delta_time * state.theta_dot;
-    state.theta_dot += delta_time * theta_acc;
+    state.x += p.delta_time * state.x_dot;
+    state.x_dot += p.delta_time * x_acc;
+    state.theta += p.delta_time * state.theta_dot;
+    state.theta_dot += p.delta_time * theta_acc;
 
-    if (state.x < - x_threshold or state.x > x_threshold
-        or state.theta < - theta_threshold_rad or state.theta > theta_threshold_rad) {
+    if (state.x < - p.x_threshold or state.x > p.x_threshold
+        or state.theta < - p.theta_threshold_rad or state.theta > p.theta_threshold_rad) {
       terminated = true;
     }
     compute_reward();
   }
 
-};
+}; // class CartPole
 
 // Let us check the ds concept.
 static_assert(gdyn::specs::system<Cartpole>);
