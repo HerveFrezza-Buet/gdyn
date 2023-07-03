@@ -1,0 +1,20 @@
+# encoding: utf-8
+
+# wscript in ./test
+
+import os
+
+def build(bld):
+    print('→ build from ' + bld.path.abspath())
+    
+    # detect files that should be build
+    for file in os.listdir( bld.path.abspath() ):
+        if file.endswith(".cpp"):
+            # print(" _should build "+file[:-4])
+            bld.program(
+                source=[file],
+                target = file[:-4],
+                includes=['.', '../src'],
+                libs = [],
+                use = []
+            )
