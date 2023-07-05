@@ -10,16 +10,23 @@
 // observation = state + reward
 // command = Left/Right/Up/Down
 
+template<typename RANDOM_GENERATOR>
 struct Parameters {
   // amount of stochasticity in moving
   double mishap_proba {0.1};
+  // Random generator
+  RANDOM_GENERATOR& gen;
+
+  Parameters(RANDOM_GENERATOR& gen) : gen(gen) {}
+
 }; // struct Parameters
 
+template<typename RG>
 class CheeseMazeState {
 
 public:
 
-  Parameters param;
+  Parameters<RG>& param;
 
   enum class Cell : int {C1 = 0, C2, C3, C4, C5, C6, C7, C8, C9, C10 , C11};
   constexpr static int nbCell {static_cast<int>(Cell::C11)+1};
@@ -30,6 +37,20 @@ public:
   }
   enum class Dir : int {Left = 0, Right, Up, Down};
   constexpr static int nbDir {static_cast<int>(Dir::Down)+1};
+  static std::string to_string ( const Dir& d ) {
+    switch (d) {
+    case CheeseMazeState<RG>::Dir::Left:
+      return "L";
+    case CheeseMazeState<RG>::Dir::Right:
+      return "R";
+    case CheeseMazeState<RG>::Dir::Up:
+      return "U";
+    case CheeseMazeState<RG>::Dir::Down:
+      return "D";
+    default:
+      return "???";
+    }
+  }
 
   // Transition as a vector of vector of neighbors
   // BEWARE as Cell and Dir will be cast as int to get to results
@@ -67,7 +88,7 @@ public:
 
   template<typename RANDOM_GENERATOR>
   static state_type random_state(RANDOM_GENERATOR& gen) {
-    auto rnd_int = std::uniform_int_distribution<int>(0,CheeseMazeState::nbCell-1)(gen);
+    auto rnd_int = std::uniform_int_distribution<int>(0,CheeseMazeState<RANDOM_GENERATOR>::nbCell-1)(gen);
     state_type res = static_cast<state_type>(rnd_int);
     return res;
   }
@@ -89,7 +110,8 @@ private:
 
 public:
   // Constructor initialize Parameters
-  CheeseMazeState() : param(Parameters{}) {}
+  template<typename RANDOM_GENERATOR>
+  CheeseMazeState(Parameters<RANDOM_GENERATOR>& param) : param(param) {}
 
   // This is required by the gdyn::specs::system concept.
   // This is for initializing the state of the system.
@@ -113,8 +135,9 @@ public:
 
   // This is required by the gdyn::specs::system concept.
   // This performs a state transition.
-  template<typename RANDOM_GENERATOR>
-  void operator()(command_type command, RANDOM_GENERATOR& gen) {
+  // template<typename RANDOM_GENERATOR>
+  // void operator()(command_type command, RANDOM_GENERATOR& gen) {
+  void operator()(command_type command) {
     if(*this) { // If we are not in a terminal state
 
       auto prev_state = state;
@@ -123,10 +146,10 @@ public:
         .at(static_cast<int>(command));
 
       // mishap ?
-      auto proba = std::uniform_real_distribution<double>(0,1)(gen);
+      auto proba = std::uniform_real_distribution<double>(0,1)(param.gen);
       if (proba < param.mishap_proba) {
         state = neighbors.at(static_cast<int>(prev_state))
-          .at(std::uniform_int_distribution(0, nbDir-1)(gen));
+          .at(std::uniform_int_distribution(0, nbDir-1)(param.gen));
       }
 
       // rewards for wall and cheese
@@ -137,37 +160,27 @@ public:
   }
 }; // class CheeseMazeState
 
-std::ostream& operator<<(std::ostream& os, const CheeseMazeState::command_type& c)
+// TODO FIXME arrive pas à utiliser ces opérateurs !!
+// voir dans example-004-state
+template<typename RG>
+std::ostream& operator<<(std::ostream& os,
+                         const typename CheeseMazeState<RG>::command_type& c)
 {
-  os << "act=";
-  switch (c) {
-  case CheeseMazeState::Dir::Left:
-    os << "L";
-    break;
-  case CheeseMazeState::Dir::Right:
-    os << "R";
-    break;
-  case CheeseMazeState::Dir::Up:
-    os << "U";
-    break;
-  case CheeseMazeState::Dir::Down:
-    os << "D";
-    break;
-  default:
-    os << "???";
-  }
-
+  os << "act=" << CheeseMazeState<RG>::to_string(c);
   return os;
 }
-std::ostream& operator<<(std::ostream& os, const CheeseMazeState::state_type& s)
+template<typename RG>
+std::ostream& operator<<(std::ostream& os,
+                         const typename CheeseMazeState<RG>::state_type& s)
 {
-  os << "state=" << CheeseMazeState::to_string(s);
+  os << "state=" << CheeseMazeState<RG>::to_string(s);
   return os;
 }
 
+template<typename RG>
 void print_context(const std::string& msg,
-                   CheeseMazeState::state_type& state,
+                   const typename CheeseMazeState<RG>::state_type& state,
                    double reward ) {
-  std::cout << msg << ": "<< state << ", " << std::setw(3) << reward << std::endl;
+  std::cout << msg << ": "<< CheeseMazeState<RG>::to_string(state) << ", " << std::setw(3) << reward << std::endl;
 }
 #endif // CHEESE_MAZE_STATE_H_
