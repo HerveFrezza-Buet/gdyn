@@ -1,3 +1,14 @@
+/*
+ * Simulator of the CheeseMaze, where the State can be observed.
+ * observation = state + reward
+ * command = Left/Right/Up/Down
+ *
+ * The transitions are stochastic, so we need a RandomGenerator.
+ * 1) as an argument of operator() => breaks gdyn::system concept
+ * 2) as a field of Parameters of CheeseMaze => adds a template to CheeseMaze
+ *    because Parameters is also templated.
+ */
+
 #ifndef CHEESE_MAZE_STATE_H_
 #define CHEESE_MAZE_STATE_H_
 
@@ -6,9 +17,6 @@
 
 #include <gdyn.hpp>
 
-// Simulator of the CheeseMaze, where the State can be observed.
-// observation = state + reward
-// command = Left/Right/Up/Down
 
 template<typename RANDOM_GENERATOR>
 struct Parameters {
