@@ -9,12 +9,6 @@
 // Simulator of the CheeseMaze, where the State can be observed.
 // observation = state + reward
 // command = Left/Right/Up/Down
-
-// HFB : C'est mieux, pour tes fonctions statiques à la to_string, la définition des types,
-// etc. Utiliser une classe pour ses fonctions de namespace n'a d'intérêt, je trouve, que
-// si ce qu'on définit dedans est private.
-// AD : Yep, faut que je prenne l'habitude.
-// AD : et j'aime pas les lignes à rallonge que mon editeur ne wrappe pas bien.
 namespace cheese_maze {
 
   struct Parameters {
@@ -22,12 +16,7 @@ namespace cheese_maze {
     double mishap_proba {0.1};
   }; // struct Parameters
 
-  // HFB : Je ne m'occupe pas du générateur dans les params.
 
-
-  // J'aime bien les type Cell et Dir en dehors de la classe. En plus, comme ta classe est paramétrée a un paramètre de template, les nested types ::Dir diffèrent d'un paramétrage à l'autre, ce qui est mathématiquement faux.
-  // AD : yep, je suis d'accord.
-  
   enum class Cell : int {C1 = 0, C2, C3, C4, C5, C6, C7, C8, C9, C10 , C11};
   constexpr static int nbCell {static_cast<int>(Cell::C11)+1};
   
@@ -55,7 +44,7 @@ namespace cheese_maze {
     case Dir::Up:
       return "U";
     default:
-      return "D"; // HFB: d ne peut pas être autre chose... mais bon, en cas de bug, ton truc est peut-être mieux.
+      return "D"; 
     }
   }
 
@@ -71,22 +60,15 @@ namespace cheese_maze {
   }
 
   template<typename RG>
-  class Environment { // HFB vu le namespace, on sait que c'est un cheese_maze, et j'aimais pas le nom state, confusant avec state_type.
-
+  class Environment { 
   public:
 
-    Parameters param; // HFB: Sans générateur, on peur copier les paramètres, et les garder comme attribut public.
-
-    RG& gen; // Je le mets mutable pour qu'un const simulator puisse s'en servir.
-    // AD : TODO je connaissais pas mutable.
-    // Bonne idée de le mettre comme un attribut à part.
-    // TODO mais il faut penser à l'initialiser/définir.
-    // AD : mutable RG& [aka a reference] is not allowed
-    // https://stackoverflow.com/questions/8469209/why-cant-i-declare-a-reference-to-a-mutable-object-reference-cannot-be-decla
+    Parameters param; 
+    RG& gen; 
 
     // Transition as a vector of vector of neighbors
     // BEWARE as Cell and Dir will be cast as int to get to results
-    std::vector<std::vector<Cell>> neighbors = {
+    std::array<std::array<Cell, 4>, 12> neighbors = {
       {Cell::C1, Cell::C2, Cell::C1, Cell::C6},
       {Cell::C1, Cell::C3, Cell::C2, Cell::C2},
       {Cell::C2, Cell::C4, Cell::C3, Cell::C7},
@@ -125,9 +107,6 @@ namespace cheese_maze {
 
   public:
 
-    // HFB: Ta version était foireuse, tu n'avais pas besoin de templatifier le constructeur. Mais en plus, maintenant, on peut juste copier les paramètres.
-    // AD : TODO : j'avais l'impression que le template était obligatoire car
-    // mon Parameters était avec template. j'ai faux ?
     Environment(const Parameters& params,
                 RG& generator) : param(params), gen(generator) {}
 
@@ -158,17 +137,16 @@ namespace cheese_maze {
     void operator()(command_type command) {
       if(*this) { // If we are not in a terminal state
 
-        // AD : TODO space vs tab
         auto prev_state = state;
         // deterministic transition
-        state = neighbors.at(static_cast<int>(prev_state))
-          .at(static_cast<int>(command));
+        state = neighbors[(static_cast<int>(prev_state))]
+	  [(static_cast<int>(command))];
 
         // mishap ?
         auto proba = std::uniform_real_distribution<double>(0,1)(gen);
         if (proba < param.mishap_proba) {
-          state = neighbors.at(static_cast<int>(prev_state))
-            .at(std::uniform_int_distribution(0, nbDir-1)(gen));
+          state = neighbors[(static_cast<int>(prev_state))]
+            [(std::uniform_int_distribution(0, nbDir-1)(gen))];
         }
 
         // rewards for wall and cheese
@@ -179,9 +157,6 @@ namespace cheese_maze {
     }
   }; // class Environment
 
-  // HFB: Ca devrait fixer tes issues je pense... N'oublie pas le inline !
-  // J'ai vire les const&... c'est des int ces trucs.
-  // AD : TODO : ok mais pourquoi (inline et changement de type) ??
   inline std::ostream& operator<<(std::ostream& os, Dir c)
   {
     os << "act=" << to_string(c);
@@ -194,10 +169,9 @@ namespace cheese_maze {
     return os;
   }
 
-  template<typename RG>
-  void print_context(const std::string& msg,
-                    const typename Environment<RG>::state_type& state,
-                     double reward ) {
+  inline void print_context(const std::string& msg,
+			    Cell state,
+			    double reward ) {
     std::cout << msg << ": "<< to_string(state) << ", " << std::setw(3) << reward << std::endl;
   }
 } // namespace cheese_maze
