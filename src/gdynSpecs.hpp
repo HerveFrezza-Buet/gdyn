@@ -51,6 +51,23 @@ namespace gdyn {
     };
 
     /**
+     * @short This specifies a dynamical system for which you can
+     * access the internal state.
+     */
+    template<typename DYNAMICAL_SYSTEM>
+    concept transparent_system =
+      system<DYNAMICAL_SYSTEM>
+      && 
+      requires (DYNAMICAL_SYSTEM system, DYNAMICAL_SYSTEM const constant_system,
+	      typename DYNAMICAL_SYSTEM::state_type state,
+	      typename DYNAMICAL_SYSTEM::state_type const constant_state) {
+      // Let us require syntactical properties.
+      state          = system.state();            // Get the state of the system.
+      constant_state = constant_system.state();   // Get the state of the system.
+    };
+
+    
+    /**
      * @short This specifies what a controller is.
      * 
      * Indeed, it is only a function that provides the command to be
