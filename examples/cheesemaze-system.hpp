@@ -27,7 +27,7 @@ namespace cheese_maze {
   }
   
   template<typename RANDOM_GENERATOR>
-  Cell random_cell(RANDOM_GENERATOR& gen) {
+  Cell random_state(RANDOM_GENERATOR& gen) {
     auto rnd_int = std::uniform_int_distribution<int>(0, nbCell-1)(gen);
     return static_cast<Cell>(rnd_int);
   }
@@ -50,7 +50,7 @@ namespace cheese_maze {
 
   // Random command
   template<typename RANDOM_GENERATOR>
-  Dir random_dir(RANDOM_GENERATOR& gen) {
+  Dir random_command(RANDOM_GENERATOR& gen) {
     switch(std::uniform_int_distribution<int>(0, nbDir-1)(gen)) {
     case  0: return Dir::Left; break;
     case  1: return Dir::Right; break;
@@ -156,6 +156,11 @@ namespace cheese_maze {
       }
     }
   }; // class Environment
+
+  template<typename RG>
+  auto make_environment(const Parameters& params, RG& generator) {
+    return Environment<RG>(params, generator);
+  }
 
   inline std::ostream& operator<<(std::ostream& os, Dir c)
   {
