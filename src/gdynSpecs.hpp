@@ -93,11 +93,13 @@ namespace gdyn {
       requires {
       typename ORBIT_VALUE::observation_type;
       typename ORBIT_VALUE::command_type;
+      typename ORBIT_VALUE::report_type;
     } &&
     requires (ORBIT_VALUE value, ORBIT_VALUE::observation_type obs, ORBIT_VALUE::command_type cmd, bool test) {
-      obs  = value.observation; // observation resulting from the current internal state.
-      cmd  = *(value.command);  // The command to be applied from this state (or nothing is we have reached a terminal state).
-      test = value.command.has_value();
+      obs  = value.observation;               // observation resulting from the current internal state.
+      test = value.transition.has_value();    // False for terminal states.
+      cmd  = (*(value.transition)).command;   // The command applied from this state to reach next internal state.
+      report  = (*(value.transition)).report; // The report of the transition to next internal state..
     };
     
     /**

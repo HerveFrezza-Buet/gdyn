@@ -85,11 +85,20 @@ namespace gdyn {
 
       using difference_type = std::ptrdiff_t;
 
+      struct transition_type {
+	typename SYSTEM::command_type command;
+	typename SYSTEM::report_type  report;
+	transition_type(const typename SYSTEM::command_type& command,
+			const typename SYSTEM::report_type& report)
+	  :command(command), report(report){}
+      };
+      
       struct value_type {
 	using observation_type = typename SYSTEM::observation_type;
 	using command_type     = typename SYSTEM::command_type;
-	observation_type            observation;
-	std::optional<command_type> command;
+	using report_type      = typename SYSTEM::report_type;
+	observation_type               observation;
+	std::optional<transition_type> transition;
 	
 	value_type()                             = default;
 	value_type(const value_type&)            = default;
@@ -97,8 +106,9 @@ namespace gdyn {
 	value_type(value_type&&)                 = default;
 	value_type& operator=(value_type&&)      = default;
 	value_type(const observation_type& observation,
-		   const command_type& command)
-	  : observation(observation), command(command) {}
+		   const command_type& command,
+		   const report_type& report)
+	  : observation(observation), transition(command, report) {}
 	  
       };
       
@@ -123,25 +133,26 @@ namespace gdyn {
 	    terminated = true;
 	  else if(system) {
 	    value.observation = *system;
-	    value.command = *it;
+	    value.transiton.command = *it;
 	  }
 	  else { // We are in a terminal state.
 	    value.observation = *system;
-	    value.command = std::nullopt;
+	    value.transition = std::nullopt;
 	  }
       }
       
       bool operator==(terminal_t) const {return terminated;}
       auto& operator*() const {return value;}
-      auto& operator++() {
-	if(value.command) { // we are not in a terminal state (the has been checked at previous iteration).
-	  (*system)(*(value.command)); 
+      auto& operator++() { FIXME: c'est la merde.
+	if(value.transition) { // we are not in a terminal state (the has been checked at previous iteration).
+	  (*(value.transition)).report = (*system)((*(value.transition)).command); 
 	  value.observation = *(*system);
+	  
 	  ++it;
 	  if(it == end || !(*system))
-	    value.command = std::nullopt;
+	    value.transition = std::nullopt;
 	  else
-	    value.command = *it;
+	    (*(value.transition)).command = *it;
 	}
 	else // we are in a terminal state
 	  terminated = true;
