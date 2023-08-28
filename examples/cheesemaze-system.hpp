@@ -68,7 +68,7 @@ namespace cheese_maze {
 
     // Transition as a vector of vector of neighbors
     // BEWARE as Cell and Dir will be cast as int to get to results
-    std::array<std::array<Cell, 4>, 12> neighbors = {
+    std::array<std::array<Cell, 4>, 11> neighbors {{
       {Cell::C1, Cell::C2, Cell::C1, Cell::C6},
       {Cell::C1, Cell::C3, Cell::C2, Cell::C2},
       {Cell::C2, Cell::C4, Cell::C3, Cell::C7},
@@ -82,7 +82,7 @@ namespace cheese_maze {
       {Cell::C9, Cell::C9, Cell::C6, Cell::C9},
       {Cell::C10, Cell::C10, Cell::C7, Cell::C10},
       {Cell::C11, Cell::C11, Cell::C8, Cell::C11},
-    };
+      }};
 
     // various spaces, as required by gdyn::specs::system.
     using observation_type = std::tuple<Cell, double>;

@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 
   cheese_maze::Parameters param;
   param.mishap_proba = 0.0;
-  auto simulator = cheeze_maze::make_environment(param, gen);
+  auto simulator = cheese_maze::make_environment(param, gen);
 
   // Let us check the type requirements for our simulator.
   static_assert(gdyn::specs::system<decltype(simulator)>);
@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
 
   // Let us apply a command to the system. Here we well apply a random
   // one.
-  CheeseMaze::command_type cmd = cheese_maze::random_command(gen);
+  auto cmd = cheese_maze::random_command(gen);
   std::cout << "  apply " << cmd  << std::endl;
   simulator(cmd);
   std::tie(state, reward) = *simulator; // We get the new observation.
