@@ -38,16 +38,16 @@ namespace gdyn {
       typename DYNAMICAL_SYSTEM::state_type;
       typename DYNAMICAL_SYSTEM::observation_type;
       typename DYNAMICAL_SYSTEM::command_type;
+      typename DYNAMICAL_SYSTEM::report_type;
     } &&
     requires (DYNAMICAL_SYSTEM system, DYNAMICAL_SYSTEM const constant_system,
 	      typename DYNAMICAL_SYSTEM::state_type const constant_state,
-	      typename DYNAMICAL_SYSTEM::observation_type observation,
 	      typename DYNAMICAL_SYSTEM::command_type const constant_command) {
       // Let us require syntactical properties.
-      system      = constant_state;                   // Set the state of the system.
-      observation = *constant_system;                 // Get the current observation.
-      system(constant_command);                       // Performs the transition
-      {constant_system} -> std::convertible_to<bool>; // false means in terminal state.
+      system = constant_state;                                                            // Set the state of the system.
+      {*constant_system} -> std::same_as<typename DYNAMICAL_SYSTEM::observation_type>;    // Get the current observation.
+      {system(constant_command)} -> std::same_as<typename DYNAMICAL_SYSTEM::report_type>; // Performs the transition and get a report (may be gdyn::no_report if nothing needs to be reported).
+      {constant_system} -> std::convertible_to<bool>;                                     // false means in terminal state.
     };
 
     /**
@@ -58,10 +58,9 @@ namespace gdyn {
     concept transparent_system =
       system<DYNAMICAL_SYSTEM>
       && 
-      requires (DYNAMICAL_SYSTEM const constant_system,
-	      typename DYNAMICAL_SYSTEM::state_type state) {
+      requires (DYNAMICAL_SYSTEM const constant_system) {
       // Let us require syntactical properties.
-      state = constant_system.state();   // Get the state of the system.
+      {constant_system.state()} -> std::same_as<typename DYNAMICAL_SYSTEM::state_type>;   // Get the state of the system.
     };
 
     
@@ -96,8 +95,8 @@ namespace gdyn {
       typename ORBIT_VALUE::command_type;
     } &&
     requires (ORBIT_VALUE value, ORBIT_VALUE::observation_type obs, ORBIT_VALUE::command_type cmd, bool test) {
-      obs  = value.observation;
-      cmd  = *(value.command);
+      obs  = value.observation; // observation resulting from the current internal state.
+      cmd  = *(value.command);  // The command to be applied from this state (or nothing is we have reached a terminal state).
       test = value.command.has_value();
     };
     
