@@ -29,6 +29,7 @@ limitations under the License.
 #include <gdynSpecs.hpp>
 #include <gdynIterators.hpp>
 #include <gdynRanges.hpp>
+#include <gdynSystem.hpp>
 
 namespace gdyn {
   namespace checkings {
@@ -47,6 +48,27 @@ namespace gdyn {
       operator bool() const {return true;} 
     };
     static_assert(specs::system<system_type>);
+
+    
+    // Transparent System
+    // ------------------
+
+    struct transparent_system_type {
+      using observation_type = double;
+      using command_type     = int;
+      using state_type       = char;
+      
+      transparent_system_type& operator=(const state_type& init_state) {return *this;}
+      observation_type operator*() const {return 0;}
+      state_type state() const {return 'a';}
+      void operator()(command_type command) {}
+      operator bool() const {return true;} 
+    };
+    static_assert(specs::transparent_system<transparent_system_type>);
+    static_assert(specs::system<transparent_system_type>);
+    static_assert(specs::system<system::exposed<transparent_system_type>>);
+
+    
 
     
     // Controller

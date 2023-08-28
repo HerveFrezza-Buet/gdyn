@@ -9,10 +9,23 @@
 
 #include "cheesemaze-system.hpp"
 
+template<typename SIMULATOR, typename GEN>
+void orbit(SIMULATOR& sim, GEN& gen) {
+  for(auto [sample, command]
+	: gdyn::ranges::tick([&gen](){return cheese_maze::random_command(gen);})
+	| gdyn::views::orbit(sim)      
+	| std::views::take(10)) {
+    auto [observation_or_state, reward] = sample;
+    cheese_maze::print_context("step", observation_or_state, reward);
+  }
+}
+
 int main(int argc, char *argv[]) {
 
   std::random_device rd;
   std::mt19937 gen(rd());
+
+  cheese_maze::Cell state;
 
 
   cheese_maze::Parameters param;
@@ -21,20 +34,33 @@ int main(int argc, char *argv[]) {
 
   // Let us check the type requirements for our simulator.
   static_assert(gdyn::specs::system<decltype(simulator)>);
+  static_assert(gdyn::specs::transparent_system<decltype(simulator)>);
 
-  std::cout << "__Welcome to the CheeseMaze **********************" << std::endl;
-  simulator = cheese_maze::random_state(gen); // We set the state.
-  auto [state, reward] = *simulator;     // We get the observation.
-  cheese_maze::print_context("start", state, reward);
+  state = cheese_maze::random_state(gen); 
+  simulator = state; // We set the state, by an extra 'out of concept' function.
+  // simulator = {state, 0}; // This is the initialization fitting the system concept.
+  std::cout << std::endl << std::endl
+	    << "Orbit of observations (i.e. local view of walls)"
+	    << std::endl;
+  cheese_maze::print_context("start", std::get<0>(simulator.state()), std::get<1>(simulator.state())); // .state() is available for transparent systems.
+  orbit(simulator, gen);
+  
+  // simulator separates the internal state from the observation. We
+  // can ignore observation and work only with states, by "exposing"
+  // the simulator (i.e. the observations become the state itself).
 
-  // Let us apply a command to the system. Here we well apply a random
-  // one.
-  auto cmd = cheese_maze::random_command(gen);
-  std::cout << "  apply " << cmd  << std::endl;
-  simulator(cmd);
-  std::tie(state, reward) = *simulator; // We get the new observation.
-  cheese_maze::print_context("current", state, reward);
-  std::cout << std::endl;
-
+  auto exposed_simulator = gdyn::system::make_exposed(simulator);
+  
+  static_assert(gdyn::specs::system<decltype(exposed_simulator)>);
+  // static_assert(gdyn::specs::transparent_system<decltype(exposed_simulator)>);
+  
+  state = cheese_maze::random_state(gen); 
+  simulator = state; // We set the state (to exposed simulator as well, since it owns a reference on simulator).
+  std::cout << std::endl << std::endl
+	    << "Orbit of states (i.e. cells)"
+	    << std::endl;
+  cheese_maze::print_context("start", state, 0); // .state() is not available for non-transparent systems.
+  orbit(exposed_simulator, gen);
+  
   return 0;
 }

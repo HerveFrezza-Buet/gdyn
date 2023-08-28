@@ -59,6 +59,21 @@ namespace cheese_maze {
     }
   }
 
+  
+  enum class Walls : int {bLUr=0, BlUr, blUr, blUR, bLuR, BLuR};
+  constexpr static int nbWalls {static_cast<int>(Walls::BLuR)+1};
+
+  static std::string to_string (const Walls& w) {
+    switch (w) {
+    case Walls::bLUr: return ".LU.";
+    case Walls::BlUr: return "B.U.";
+    case Walls::blUr: return "..U.";
+    case Walls::blUR: return "..UR";
+    case Walls::bLuR: return ".L.R";
+    case Walls::BLuR:
+    default:          return "BL.R";
+    }
+  }
   template<typename RG>
   class Environment { 
   public:
@@ -68,7 +83,7 @@ namespace cheese_maze {
 
     // Transition as a vector of vector of neighbors
     // BEWARE as Cell and Dir will be cast as int to get to results
-    std::array<std::array<Cell, 4>, 11> neighbors {{
+    std::array<std::array<Cell, nbDir>, nbCell> neighbors {{
       {Cell::C1, Cell::C2, Cell::C1, Cell::C6},
       {Cell::C1, Cell::C3, Cell::C2, Cell::C2},
       {Cell::C2, Cell::C4, Cell::C3, Cell::C7},
@@ -83,22 +98,36 @@ namespace cheese_maze {
       {Cell::C10, Cell::C10, Cell::C7, Cell::C10},
       {Cell::C11, Cell::C11, Cell::C8, Cell::C11},
       }};
-
+    
+    std::array<Walls, nbCell> local_view {
+      Walls::bLUr,
+      Walls::BlUr,
+      Walls::blUr,
+      Walls::BlUr,
+      Walls::blUR,
+      Walls::bLuR,
+      Walls::bLuR,
+      Walls::bLuR,
+      Walls::BLuR,
+      Walls::BLuR,
+      Walls::BLuR,
+    };
+    
     // various spaces, as required by gdyn::specs::system.
-    using observation_type = std::tuple<Cell, double>;
+    using observation_type = std::tuple<Walls, double>;
     using command_type     = Dir;
-    using state_type       = Cell;
+    using state_type       = std::tuple<Cell, double>;
 
 
   private:
 
-    state_type state {Cell::C1};
+    Cell internal_state {Cell::C1};
     double     reward {0};
 
     // Does NOT take into account Bumping into walls
     void compute_reward() {
-      if (state == Cell::C10) {
-        reward = 5;
+      if (internal_state == Cell::C10) {
+	reward = 5;
       }
       else {
         reward = 0;
@@ -113,7 +142,12 @@ namespace cheese_maze {
     // This is required by the gdyn::specs::system concept.
     // This is for initializing the state of the system.
     Environment& operator=(const state_type& init_state) {
-      state = init_state;
+      internal_state = init_state;
+      return *this;
+    }
+    
+    Environment& operator=(Cell init_state) {
+      internal_state = init_state;
       compute_reward();
       return *this;
     }
@@ -121,13 +155,15 @@ namespace cheese_maze {
     // This is required by the gdyn::specs::system concept.
     // This returns the obsrvation corresponding to the system's state.
     observation_type operator*() const {
-      return {state, reward};
+      return {local_view[static_cast<int>(internal_state)], reward};
     }
+
+    state_type state() const {return {internal_state, reward};}
 
     // This is required by the gdyn::specs::system concept.
     // This it true if the system is not in a terminal state.
     operator bool() const {
-      return state != Cell::C10;
+      return internal_state != Cell::C10;
     }
 
     // This is required by the gdyn::specs::system concept.
@@ -137,20 +173,21 @@ namespace cheese_maze {
     void operator()(command_type command) {
       if(*this) { // If we are not in a terminal state
 
-        auto prev_state = state;
+        auto prev_state = internal_state;
         // deterministic transition
-        state = neighbors[(static_cast<int>(prev_state))]
+        internal_state = neighbors[(static_cast<int>(prev_state))]
 	  [(static_cast<int>(command))];
 
         // mishap ?
         auto proba = std::uniform_real_distribution<double>(0,1)(gen);
         if (proba < param.mishap_proba) {
-          state = neighbors[(static_cast<int>(prev_state))]
+          internal_state = neighbors[(static_cast<int>(prev_state))]
             [(std::uniform_int_distribution(0, nbDir-1)(gen))];
         }
 
-        // rewards for wall and cheese
-        if (prev_state == state) {
+	compute_reward();
+        // If we have bumped into a wall...
+        if (prev_state == internal_state) {
           reward = reward - 1;
         }
       }
@@ -173,10 +210,18 @@ namespace cheese_maze {
     os << "state=" << to_string(s);
     return os;
   }
-
-  inline void print_context(const std::string& msg,
-			    Cell state,
-			    double reward ) {
-    std::cout << msg << ": "<< to_string(state) << ", " << std::setw(3) << reward << std::endl;
+  
+  inline std::ostream& operator<<(std::ostream& os, Walls w)
+  {
+    os << "local_view=" << to_string(w);
+    return os;
   }
+
+  template<typename THING>
+  void print_context(const std::string& msg,
+		     THING thing,
+		     double reward ) {
+    std::cout << msg << ": "<< to_string(thing) << ", " << std::setw(3) << reward << std::endl;
+  }
+  
 } // namespace cheese_maze
