@@ -20,8 +20,8 @@ int main(int argc, char* argv[]) {
   unsigned int step;
   
   simulator = Bonobo::random_state(gen); // We set the state
-  auto [state, reward] = *simulator;     // We get the observation.
-  print_start(state, reward);
+  auto state = *simulator; // We get the observation.
+  print_start(state);
 
   step = 1;
   for(const auto& t 
@@ -30,15 +30,15 @@ int main(int argc, char* argv[]) {
 	| std::views::take(20)                                              // We take ato modt 20 orbit points.
 	| gdyn::views::transition)                                          // We gather them into transitions.
     print_transition(t, step);
-  
-  std::tie(state, reward) = *simulator; // We get the observation.
-  print_terminal(state, reward);
+
+  state = *simulator; // We get the observation.
+  print_terminal(state);
   
   // With ranges, we can easily set up a dataset from a set of successive orbits.
   std::cout << std::endl
 	    << "Let us collect a dataset from " << NB_ORBITS << " orbits." << std::endl;
   
-  std::vector<gdyn::transition<Bonobo::observation_type, Bonobo::command_type>> transitions_dataset;
+  std::vector<gdyn::transition<Bonobo::observation_type, Bonobo::command_type, Bonobo::report_type>> transitions_dataset;
   for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit) {
     simulator = Bonobo::random_state(gen);
     std::ranges::copy(gdyn::ranges::tick([&gen](){return Bonobo::random_command(gen);}) // We generate random command.

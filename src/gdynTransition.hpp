@@ -47,7 +47,7 @@ namespace gdyn {
       command = *next_command;
       report = *(next.previous_report); // There must be a report in the option.
       next_observation = next.current_observation;
-      next_command = next.command;
+      next_command = next.next_command;
     }
 
     transition()                             = default;
@@ -66,7 +66,7 @@ namespace gdyn {
     
     transition(const OBSERVATION&            observation,
 	       const COMMAND&                command,
-	       const REPORT&                 report,
+	       const REPORT&  report,
 	       const OBSERVATION&            next_observation)
       : transition(observation, command, report, next_observation, std::nullopt) {}
     
@@ -89,7 +89,7 @@ namespace gdyn {
    */
   template<specs::orbit_point ORBIT_POINT>
   auto make_transition(const ORBIT_POINT& current, const ORBIT_POINT& next) {
-    return transition<typename ORBIT_POINT::observation_type, typename ORBIT_POINT::command_type, typename ORBIT_POINT::report_type>(current.observation, *current.command, next.observation, next.command);
+    return transition<typename ORBIT_POINT::observation_type, typename ORBIT_POINT::command_type, typename ORBIT_POINT::report_type>(current.current_observation, *(current.next_command), *(next.previous_report), next.current_observation, next.next_command);
   }
 
   

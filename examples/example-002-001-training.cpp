@@ -37,12 +37,11 @@ public:
 
   adaptive_controller() = default;
 
-  // This controller is geedy. If the average reward for a state us
+  // This controller is geedy. If the average reward for a state is
   // known, the command is the one with the highest reward. Otherwise,
   // we return 'B'. 
   auto operator()(const Bonobo::observation_type& observation) const {
-    auto word = std::get<0>(observation); // observation is like  ('BONOBO', 100).
-    if(auto it = reward_average.find(word); it != reward_average.end()) {
+    if(auto it = reward_average.find(observation); it != reward_average.end()) {
       auto values = it->second; // This is an array of 3 double
       auto best_position = std::distance(values.begin(),
 					 std::max_element(values.begin(), values.end()));
@@ -59,10 +58,10 @@ public:
 #define ALPHA .1
   // Here, we train the controller from a transition. It consists in
   // updating the knowledge about average rewards.
-  void learn(const gdyn::transition<Bonobo::observation_type, Bonobo::command_type>& sample) {
-    auto obs    = std::get<0>(sample.observation);
+  void learn(const gdyn::transition<Bonobo::observation_type, Bonobo::command_type, Bonobo::report_type>& sample) {
+    auto obs    = sample.observation;
     auto cmd    = sample.command;
-    auto reward = std::get<1>(sample.next_observation); 
+    auto reward = sample.report; 
 
     if(reward == 0) {
       // If we already know something about the reward, we update the
