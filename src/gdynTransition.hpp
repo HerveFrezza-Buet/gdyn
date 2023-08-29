@@ -30,10 +30,11 @@ namespace gdyn {
   /**
    * This is an orbit "segment", i.e. two consecutive orbit points.
    */
-  template<typename OBSERVATION, typename COMMAND>
+  template<typename OBSERVATION, typename COMMAND, typename REPORT>
   struct transition {
     OBSERVATION            observation;      //!< the current observation
     COMMAND                command;          //!< the current command
+    REPORT                 report;           //!< the resulting report
     OBSERVATION            next_observation; //!< the next observation
     std::optional<COMMAND> next_command;     //!< eventually, the next command (if the systeem has not reached a terminal state).
 
@@ -44,7 +45,8 @@ namespace gdyn {
     void operator+=(const ORBIT_POINT& next) {
       observation = next_observation;
       command = *next_command;
-      next_observation = next.observation;
+      report = *(next.previous_report); // There must be a report in the option.
+      next_observation = next.current_observation;
       next_command = next.command;
     }
 
@@ -56,21 +58,24 @@ namespace gdyn {
 
     transition(const OBSERVATION&            observation,
 	       const COMMAND&                command,
+	       const REPORT&                 report,
 	       const OBSERVATION&            next_observation,
 	       const std::optional<COMMAND>& next_command)
-      : observation(observation), command(command),
+      : observation(observation), command(command), report(report),
 	next_observation(next_observation), next_command(next_command) {}
     
     transition(const OBSERVATION&            observation,
 	       const COMMAND&                command,
+	       const REPORT&                 report,
 	       const OBSERVATION&            next_observation)
-      : transition(observation, command, next_observation, std::nullopt) {}
+      : transition(observation, command, report, next_observation, std::nullopt) {}
     
     transition(const OBSERVATION&            observation,
 	       const COMMAND&                command,
+	       const REPORT&                 report,
 	       const OBSERVATION&            next_observation,
 	       const COMMAND&                next_command)
-      : transition(observation, command, next_observation, next_command) {}
+      : transition(observation, command, report, next_observation, next_command) {}
 
     bool is_terminal() const {return !(next_command.has_value());}
   };
@@ -84,7 +89,7 @@ namespace gdyn {
    */
   template<specs::orbit_point ORBIT_POINT>
   auto make_transition(const ORBIT_POINT& current, const ORBIT_POINT& next) {
-    return transition<typename ORBIT_POINT::observation_type, typename ORBIT_POINT::command_type>(current.observation, *current.command, next.observation, next.command);
+    return transition<typename ORBIT_POINT::observation_type, typename ORBIT_POINT::command_type, typename ORBIT_POINT::report_type>(current.observation, *current.command, next.observation, next.command);
   }
 
   

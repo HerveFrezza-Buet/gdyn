@@ -157,6 +157,9 @@ namespace gdyn {
 				   
     template<specs::orbit_iterator ORBIT_ITERATOR>
     using command_t = typename ORBIT_ITERATOR::value_type::command_type;
+				   
+    template<specs::orbit_iterator ORBIT_ITERATOR>
+    using report_t = typename ORBIT_ITERATOR::value_type::report_type;
 
 
     // This is for iterating on system transitions.
@@ -170,7 +173,7 @@ namespace gdyn {
 
     public:
 
-      using value_type = gdyn::transition<observation_t<ORBIT_ITERATOR>, command_t<ORBIT_ITERATOR>>;
+      using value_type = gdyn::transition<observation_t<ORBIT_ITERATOR>, command_t<ORBIT_ITERATOR>, report_t<ORBIT_ITERATOR>>;
       
     private:
       

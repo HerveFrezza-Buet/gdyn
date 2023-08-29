@@ -13,13 +13,13 @@ int main(int argc, char* argv[]) {
   Bonobo simulator;
   
   simulator = Bonobo::random_state(gen); // We set the state.
-  auto [state, reward] = *simulator;     // We get the observation.
-  print_start(state, reward);
+  auto state = *simulator;     // We get the observation.
+  print_start(state);
 
   // Let us apply a command to the system. Here we well apply a random
-  // one.
-  simulator(Bonobo::random_command(gen));
-  std::tie(state, reward) = *simulator; // We get the new observation.
+  // one. We get the reward (i.e. the transition report).
+  auto reward = simulator(Bonobo::random_command(gen));
+  state = *simulator; // We get the new observation.
   print_current(state, reward);
   std::cout << std::endl;
 
@@ -40,17 +40,16 @@ int main(int argc, char* argv[]) {
     // We return the command correponding to the last letter
     return static_cast<Bonobo::letter>(state[5]);
   };
-  std::tie(state, reward) = *simulator;
-  print_start(state, reward);
+  state = *simulator;
+  print_start(state);
   for(auto command
-	: gdyn::ranges::tick([&simulator, &policy](){return policy(std::get<0>(*simulator));})
+	: gdyn::ranges::tick([&simulator, &policy](){return policy(*simulator);})
 	| std::views::take(20)) {
-    simulator(command); // We apply the command to the system to trigger a state transition.
-    std::tie(state, reward) = *simulator;
+    reward = simulator(command); // We apply the command to the system to trigger a state transition.
+    state = *simulator;
     std::cout << command << " => " << state << " (" << reward << ")." << std::endl;
   }
-  std::tie(state, reward) = *simulator;
-  print_terminal(state, reward);
+  print_terminal(state);
 
   // What we have just done is running an orbit/trajectory of the dynamical system. See next example.
   
