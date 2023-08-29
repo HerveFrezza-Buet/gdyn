@@ -1,6 +1,6 @@
 /*
 
-Copyright 2023 Herve FREZZA-BUET
+Copyright 2023 Herve FREZZA-BUET, Alain DUTECH
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -41,10 +41,11 @@ namespace gdyn {
       using observation_type = double;
       using command_type     = int;
       using state_type       = char;
+      using report_type      = float;
       
       system_type& operator=(const state_type& init_state) {return *this;}
       observation_type operator*() const {return 0;}
-      void operator()(command_type command) {}
+      report_type operator()(command_type command) {return 0.;}
       operator bool() const {return true;} 
     };
     static_assert(specs::system<system_type>);
@@ -57,11 +58,12 @@ namespace gdyn {
       using observation_type = double;
       using command_type     = int;
       using state_type       = char;
+      using report_type      = float;
       
       transparent_system_type& operator=(const state_type& init_state) {return *this;}
       observation_type operator*() const {return 0;}
       state_type state() const {return 'a';}
-      void operator()(command_type command) {}
+      report_type operator()(command_type command) {return 0.;}
       operator bool() const {return true;} 
     };
     static_assert(specs::transparent_system<transparent_system_type>);

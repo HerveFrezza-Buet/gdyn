@@ -1,6 +1,6 @@
 /*
 
-Copyright 2023 Herve FREZZA-BUET
+Copyright 2023 Herve FREZZA-BUET, Alain DUTECH
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

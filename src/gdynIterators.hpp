@@ -1,6 +1,6 @@
 /*
 
-Copyright 2023 Herve FREZZA-BUET
+Copyright 2023 Herve FREZZA-BUET, Alain DUTECH
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -85,31 +85,21 @@ namespace gdyn {
 
       using difference_type = std::ptrdiff_t;
 
-      struct transition_type {
-	typename SYSTEM::command_type command;
-	typename SYSTEM::report_type  report;
-	transition_type(const typename SYSTEM::command_type& command,
-			const typename SYSTEM::report_type& report)
-	  :command(command), report(report){}
-      };
       
       struct value_type {
 	using observation_type = typename SYSTEM::observation_type;
 	using command_type     = typename SYSTEM::command_type;
 	using report_type      = typename SYSTEM::report_type;
-	observation_type               observation;
-	std::optional<transition_type> transition;
+	observation_type            current_observation;
+	std::optional<command_type> next_command;
+	std::optional<report_type>  previous_report;
+	
 	
 	value_type()                             = default;
 	value_type(const value_type&)            = default;
 	value_type& operator=(const value_type&) = default;
 	value_type(value_type&&)                 = default;
 	value_type& operator=(value_type&&)      = default;
-	value_type(const observation_type& observation,
-		   const command_type& command,
-		   const report_type& report)
-	  : observation(observation), transition(command, report) {}
-	  
       };
       
     private:
@@ -132,27 +122,28 @@ namespace gdyn {
 	  if(it == end)
 	    terminated = true;
 	  else if(system) {
-	    value.observation = *system;
-	    value.transiton.command = *it;
+	    value.current_observation = *system;
+	    value.next_command = *it;
 	  }
 	  else { // We are in a terminal state.
-	    value.observation = *system;
-	    value.transition = std::nullopt;
+	    value.current_observation = *system;
+	    value.next_command = std::nullopt;
 	  }
       }
       
       bool operator==(terminal_t) const {return terminated;}
       auto& operator*() const {return value;}
-      auto& operator++() { FIXME: c'est la merde.
-	if(value.transition) { // we are not in a terminal state (the has been checked at previous iteration).
-	  (*(value.transition)).report = (*system)((*(value.transition)).command); 
-	  value.observation = *(*system);
+      auto& operator++() {
+	if(value.next_command) {// we are not in a terminal state (the has been checked at previous iteration).
+	  // We perform a transition.
+	  value.previous_report = (*system)(*(value.next_command));
+	  value.current_observation = *(*system);
 	  
-	  ++it;
+	  ++it; // We get next command
 	  if(it == end || !(*system))
-	    value.transition = std::nullopt;
+	    value.next_command = std::nullopt;
 	  else
-	    (*(value.transition)).command = *it;
+	    value.next_command = *it;
 	}
 	else // we are in a terminal state
 	  terminated = true;

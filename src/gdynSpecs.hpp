@@ -1,6 +1,6 @@
 /*
 
-Copyright 2023 Herve FREZZA-BUET
+Copyright 2023 Herve FREZZA-BUET, Alain DUTECH
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -95,11 +95,12 @@ namespace gdyn {
       typename ORBIT_VALUE::command_type;
       typename ORBIT_VALUE::report_type;
     } &&
-    requires (ORBIT_VALUE value, ORBIT_VALUE::observation_type obs, ORBIT_VALUE::command_type cmd, bool test) {
-      obs  = value.observation;               // observation resulting from the current internal state.
-      test = value.transition.has_value();    // False for terminal states.
-      cmd  = (*(value.transition)).command;   // The command applied from this state to reach next internal state.
-      report  = (*(value.transition)).report; // The report of the transition to next internal state..
+    requires(ORBIT_VALUE& value) {
+      {value.current_observation} -> std::same_as<typename ORBIT_VALUE::observation_type&>; // observation resulting from the current internal state.
+      {*(value.next_command)} -> std::same_as<typename ORBIT_VALUE::command_type&>;         // The command to be executed next.
+      {value.next_command.has_value()} -> std::same_as<bool>;                               // The command is optional. It is missing for terminal state.
+      {*(value.previous_report)} -> std::same_as<typename ORBIT_VALUE::report_type&>;       // The report of the transition that has lead to current state.
+      {value.previous_report.has_value()} -> std::same_as<bool>;                            // The report is optional. It is missing for starting state.
     };
     
     /**
