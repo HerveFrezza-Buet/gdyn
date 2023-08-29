@@ -101,6 +101,7 @@ auto epsilon_greedy(RANDOM_GENERATOR& gen, double epsilon, const CONTROLLER& con
   };
 }
 
+
 int main(int argc, char* argv[]) {
   std::random_device rd;
   std::mt19937 gen(rd());
