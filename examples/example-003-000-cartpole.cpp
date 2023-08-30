@@ -10,17 +10,20 @@ int main(int argc, char* argv[]) {
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  Cartpole simulator;
+  // make Environment with default parameters
+  auto simulator = cartpole::make_environment();
+  // Let us check the type requirements for our simulator.
+  static_assert(gdyn::specs::system<decltype(simulator)>);
   
-  simulator = Cartpole::random_state(gen, simulator.param); // We set the state.
-  auto [state, reward] = *simulator;     // We get the observation.
-  print_context("start", state, reward);
+  simulator = cartpole::random_state(gen, simulator.param); // We set the state.
+  auto obs = *simulator;          // We get the observation.
+  print_context("start", obs, 0); // no reward at start
 
   // Let us apply a command to the system. Here we well apply a random
   // one.
-  simulator(Cartpole::random_command(gen));
-  std::tie(state, reward) = *simulator; // We get the new observation.
-  print_context("current", state, reward);
+  auto reward = simulator(cartpole::random_command(gen));
+  obs = *simulator; // We get the new observation.
+  print_context("current", obs, reward);
   std::cout << std::endl;
 
   // We can use command sources in order to feed the system. The tick
@@ -28,7 +31,7 @@ int main(int argc, char* argv[]) {
   // a command. Here, f is a lambda calling random_command.
   std::cout << "Random command source" << std::endl;
   for(auto command
-	: gdyn::ranges::tick([&gen](){return Cartpole::random_command(gen);})
+	: gdyn::ranges::tick([&gen](){return cartpole::random_command(gen);})
 	| std::views::take(20))
     std::cout << command << std::endl;
 
@@ -36,32 +39,35 @@ int main(int argc, char* argv[]) {
   // that chooses the command according to the system state.
   std::cout << std::endl;
   std::cout << "Policy command source" << std::endl;
-  auto policy = [](const Cartpole::state_type state) {
+  auto policy = [](const cartpole::Environment::observation_type obs) {
     // L if positive theta, R otherwise
-    if (state.theta > 0) {
-      return Cartpole::command_type::L;
+    if (obs.theta > 0) {
+      return cartpole::Environment::command_type::L;
     }
     else {
-      return Cartpole::command_type::R;
+      return cartpole::Environment::command_type::R;
     }
   };
-  std::tie(state, reward) = *simulator;
-  print_context("start", state, reward);
 
   // change Simulator parameters
   simulator.param.delta_time *= 5.0;
 
-    for(auto command
-	: gdyn::ranges::tick([&simulator, &policy](){return policy(std::get<0>(*simulator));})
-	| std::views::take(20)) {
-    simulator(command); // We apply the command to the system to trigger a state transition.
-    std::tie(state, reward) = *simulator;
-    std::cout << command << " => " << Cartpole::to_string(state) << " (" << reward << ")." << std::endl;
-  }
-  std::tie(state, reward) = *simulator;
-  print_context( "terminal", state, reward);
+  obs = *simulator;
+  print_context("start", obs, 0);
 
-  // What we have just done is running an orbit/trajectory of the dynamical system. See next example.
+  for(auto command
+        : gdyn::ranges::tick([&simulator, &policy](){return policy(*simulator);})
+        | std::views::take(20)) {
+    reward = simulator(command); // We apply the command to the system to trigger a state transition.
+    obs = *simulator;
+    print_context(cartpole::to_string(command)+" => ", obs, reward );
+
+  }
+  obs = *simulator;
+  print_context( "terminal", obs, reward);
+
+  // What we have just done is running an orbit/trajectory of the dynamical system.
+  // See example-001-001-orbit or example-004-000-cheesemaze
   
   return 0;
   
