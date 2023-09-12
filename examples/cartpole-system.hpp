@@ -113,13 +113,22 @@ namespace cartpole {
 
     // Reward of 1 until 1 update after going out of bounds
     void compute_reward() {
+      terminated = false;
+      auto p = param;
+      if (state.x < - p.x_threshold or state.x > p.x_threshold
+          or state.theta < - p.theta_threshold_rad or state.theta > p.theta_threshold_rad) {
+        terminated = true;
+      }
+
       if (not terminated) {
         reward = 1.0;
       }
-      else if (just_terminated) {
+      // in the step just falling
+      else if (not just_terminated) {
         just_terminated = true;
         reward = 1.0;
       }
+      // has already fallen
       else {
         // should not be called -> reset ?
         reward = 0.0;
@@ -147,7 +156,7 @@ namespace cartpole {
     // This is required by the gdyn::specs::system concept.
     // This it true if the system is not in a terminal state.
     operator bool() const {
-      return terminated;
+      return !terminated;
     }
 
   
@@ -174,11 +183,7 @@ namespace cartpole {
       state.theta += p.delta_time * state.theta_dot;
       state.theta_dot += p.delta_time * theta_acc;
 
-      if (state.x < - p.x_threshold or state.x > p.x_threshold
-          or state.theta < - p.theta_threshold_rad or state.theta > p.theta_threshold_rad) {
-        terminated = true;
-      }
-      compute_reward();
+      compute_reward(); // and 'terminated'
       return reward;
     }
 
