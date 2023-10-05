@@ -22,6 +22,7 @@ limitations under the License.
 
 #include <iterator>
 #include <tuple>
+#include <concepts>
 
 
 namespace gdyn {
