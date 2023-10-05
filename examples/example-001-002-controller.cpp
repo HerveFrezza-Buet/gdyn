@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
     print_orbit_point(observation, action, report, step);
   
   state = *simulator; // We get the observation.
-  print_terminal(state);
+  print_final(state);
   
   return 0;
 }

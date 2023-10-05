@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
     state = *simulator;
     std::cout << command << " => " << state << " (" << reward << ")." << std::endl;
   }
-  print_terminal(state);
+  print_final(state);
 
   // What we have just done is running an orbit/trajectory of the dynamical system. See next example.
   

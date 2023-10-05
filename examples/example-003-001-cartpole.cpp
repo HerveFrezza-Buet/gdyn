@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
 
   }
   obs = *simulator;
-  print_context( "terminal", obs, reward);
+  print_context( "final", obs, reward);
 
   // What we have just done is running an orbit/trajectory of the dynamical system.
   // See example-001-001-orbit or example-004-000-cheesemaze

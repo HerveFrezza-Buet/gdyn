@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
     print_transition(t, step);
 
   state = *simulator; // We get the observation.
-  print_terminal(state);
+  print_final(state);
   
   // With ranges, we can easily set up a dataset from a set of successive orbits.
   std::cout << std::endl

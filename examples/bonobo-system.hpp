@@ -148,8 +148,8 @@ void print_start(const std::string& state) {
   std::cout << "Starting : " << state << std::endl;
 }
 
-void print_terminal(const std::string& state) {
-  std::cout << "Terminal : " << state << std::endl;
+void print_final(const std::string& state) {
+  std::cout << "Final : " << state << std::endl;
 }
 
 void print_current(const std::string& state, double reward) {

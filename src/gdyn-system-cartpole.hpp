@@ -118,7 +118,7 @@ namespace gdyn {
 
       private:
   
-	state_type  state  {0.0, 0.0, 0.0, 0.0};
+	state_type  _state  {0.0, 0.0, 0.0, 0.0}; // state is already the type name of states.
 	double      reward {0};
 	bool        terminated {false};
 	bool        just_terminated {false};
@@ -127,8 +127,8 @@ namespace gdyn {
 	void compute_reward() {
 	  terminated = false;
 	  auto p = param;
-	  if (state.x < - p.x_threshold or state.x > p.x_threshold
-	      or state.theta < - p.theta_threshold_rad or state.theta > p.theta_threshold_rad) {
+	  if (_state.x < - p.x_threshold or _state.x > p.x_threshold
+	      or _state.theta < - p.theta_threshold_rad or _state.theta > p.theta_threshold_rad) {
 	    terminated = true;
 	  }
 
@@ -154,7 +154,7 @@ namespace gdyn {
 	// This is required by the gdyn::specs::system concept.
 	// This is for initializing the state of the system.
 	system& operator=(const state_type& init_state) {
-	  state = init_state;
+	  _state = init_state;
 	  compute_reward();
 	  return *this;
 	}
@@ -162,7 +162,7 @@ namespace gdyn {
 	// This is required by the gdyn::spec::system concept.
 	// This returns the obsrvation corresponding to the system's state.
 	observation_type operator*() const {
-	  return state;
+	  return _state;
 	}
 
 	// This is required by the gdyn::specs::system concept.
@@ -182,18 +182,18 @@ namespace gdyn {
 	    force *= -1.0;
 	  }
 
-	  auto theta = state.theta;
+	  auto theta = _state.theta;
 	  double costheta = std::cos(theta);
 	  double sintheta = std::sin(theta);
-	  double temp = (force + p.lm_pole * std::pow(state.theta_dot, 2) * sintheta) / p.mass_total;
+	  double temp = (force + p.lm_pole * (_state.theta_dot * _state.theta_dot) * sintheta) / p.mass_total;
 	  double theta_acc = (p.gravity * sintheta - costheta * temp) /
-	    (p.length_halfpole * (4.0 / 3.0 - p.mass_pole * std::pow(costheta, 2)) / p.mass_total);
+	    (p.length_halfpole * (4.0 / 3.0 - p.mass_pole * (costheta * costheta)) / p.mass_total);
 	  double x_acc = temp - p.lm_pole * theta_acc * costheta / p.mass_total;
 
-	  state.x += p.delta_time * state.x_dot;
-	  state.x_dot += p.delta_time * x_acc;
-	  state.theta += p.delta_time * state.theta_dot;
-	  state.theta_dot += p.delta_time * theta_acc;
+	  _state.x += p.delta_time * _state.x_dot;
+	  _state.x_dot += p.delta_time * x_acc;
+	  _state.theta += p.delta_time * _state.theta_dot;
+	  _state.theta_dot += p.delta_time * theta_acc;
 
 	  compute_reward(); // and 'terminated'
 	  return reward;
