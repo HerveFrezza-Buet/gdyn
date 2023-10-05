@@ -4,24 +4,30 @@
 #include <iomanip>
 
 #include <gdyn.hpp>
-#include "cartpole-system.hpp"
+
+void print_context(const std::string& msg,
+		   gdyn::problem::cartpole::system::observation_type& obs,
+		   double reward ) {
+  
+  std::cout << msg << ": "<< to_string(obs) << ", " << std::setw(3) << reward << std::endl;
+}
 
 int main(int argc, char* argv[]) {
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  // make Environment with default parameters
-  auto simulator = cartpole::make_environment();
+  // make system with default parameters
+  auto simulator = gdyn::problem::cartpole::make();
   // Let us check the type requirements for our simulator.
   static_assert(gdyn::specs::system<decltype(simulator)>);
   
-  simulator = cartpole::random_state(gen, simulator.param); // We set the state.
+  simulator = gdyn::problem::cartpole::random_state(gen, simulator.param); // We set the state.
   auto obs = *simulator;          // We get the observation.
   print_context("start", obs, 0); // no reward at start
 
   // Let us apply a command to the system. Here we well apply a random
   // one.
-  auto reward = simulator(cartpole::random_command(gen));
+  auto reward = simulator(gdyn::problem::cartpole::random_command(gen));
   obs = *simulator; // We get the new observation.
   print_context("current", obs, reward);
   std::cout << std::endl;
@@ -31,7 +37,7 @@ int main(int argc, char* argv[]) {
   // a command. Here, f is a lambda calling random_command.
   std::cout << "Random command source" << std::endl;
   for(auto command
-	: gdyn::ranges::tick([&gen](){return cartpole::random_command(gen);})
+	: gdyn::ranges::tick([&gen](){return gdyn::problem::cartpole::random_command(gen);})
 	| std::views::take(20))
     std::cout << command << std::endl;
 
@@ -39,14 +45,11 @@ int main(int argc, char* argv[]) {
   // that chooses the command according to the system state.
   std::cout << std::endl;
   std::cout << "Policy command source" << std::endl;
-  auto policy = [](const cartpole::Environment::observation_type obs) {
-    // L if positive theta, R otherwise
-    if (obs.theta > 0) {
-      return cartpole::Environment::command_type::L;
-    }
-    else {
-      return cartpole::Environment::command_type::R;
-    }
+  auto policy = [](const gdyn::problem::cartpole::system::observation_type obs) {
+    // Left if positive theta, Right otherwise
+    if (obs.theta > 0) return gdyn::problem::cartpole::system::command_type::Left; // We can use system::command_type...
+    else               return gdyn::problem::cartpole::direction::Right;           // ... or directly gdyn::problem::cartpole::direction
+    
   };
 
   // change Simulator parameters
@@ -60,7 +63,7 @@ int main(int argc, char* argv[]) {
         | std::views::take(20)) {
     reward = simulator(command); // We apply the command to the system to trigger a state transition.
     obs = *simulator;
-    print_context(cartpole::to_string(command)+" => ", obs, reward );
+    print_context(gdyn::problem::cartpole::to_string(command)+" => ", obs, reward );
 
   }
   obs = *simulator;

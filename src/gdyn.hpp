@@ -25,6 +25,8 @@ limitations under the License.
 #include <gdynRanges.hpp>
 #include <gdynTransition.hpp>
 
+#include <gdyn-system-cartpole.hpp>
+
 /**
  * @example bonobo-system.hpp
  * @example example-001-000-system.cpp
@@ -32,4 +34,5 @@ limitations under the License.
  * @example example-001-002-controller.cpp
  * @example example-001-003-transitions.cpp
  * @example example-002-001-training.cpp
+ * @example example-003-001-cartpole.cpp
  */
