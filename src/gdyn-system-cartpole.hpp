@@ -79,7 +79,7 @@ namespace gdyn {
       }
 
       // ********************************************************************* direction
-      enum class direction : int {Left = 0, Right = 1};
+      enum class direction : std::size_t {Left = 0, Right = 1};
       static std::string to_string(const direction& d) {
 	if (d == direction::Left) {
 	  return "Left";
