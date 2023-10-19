@@ -23,7 +23,7 @@ limitations under the License.
 #include <iostream>
 #include <tuple>
 
-#include <gdynSpecs.hpp>
+#include <gdynConcepts.hpp>
 
 namespace gdyn {
 
@@ -41,7 +41,7 @@ namespace gdyn {
     /**
      * We shift the current transition so thet it hosts the next one.
      */
-    template<specs::orbit_point ORBIT_POINT>
+    template<concepts::orbit_point ORBIT_POINT>
     void operator+=(const ORBIT_POINT& next) {
       observation = next_observation;
       command = *next_command;
@@ -87,7 +87,7 @@ namespace gdyn {
    * @param current An orbit point, that must not be a terminal one.
    * @param next  An orbit point.
    */
-  template<specs::orbit_point ORBIT_POINT>
+  template<concepts::orbit_point ORBIT_POINT>
   auto make_transition(const ORBIT_POINT& current, const ORBIT_POINT& next) {
     return transition<typename ORBIT_POINT::observation_type, typename ORBIT_POINT::command_type, typename ORBIT_POINT::report_type>(current.current_observation, *(current.next_command), *(next.previous_report), next.current_observation, next.next_command);
   }

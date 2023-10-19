@@ -24,7 +24,7 @@ limitations under the License.
 #include <optional>
 #include <functional>
 
-#include <gdynSpecs.hpp>
+#include <gdynConcepts.hpp>
 #include <gdynTransition.hpp>
 
 namespace gdyn {
@@ -71,8 +71,8 @@ namespace gdyn {
     
 
     // This is for iterating on system orbits.
-    template<specs::system SYSTEM,
-	     specs::command_iterator<typename SYSTEM::command_type> COMMAND_ITERATOR,
+    template<concepts::system SYSTEM,
+	     concepts::command_iterator<typename SYSTEM::command_type> COMMAND_ITERATOR,
 	     typename COMMAND_SENTINEL>
     struct orbit {
       
@@ -152,18 +152,18 @@ namespace gdyn {
       auto  operator++(int) {auto res = *this; ++(*this); return res;}   
     };
 
-    template<specs::orbit_iterator ORBIT_ITERATOR>
+    template<concepts::orbit_iterator ORBIT_ITERATOR>
     using observation_t = typename ORBIT_ITERATOR::value_type::observation_type;
 				   
-    template<specs::orbit_iterator ORBIT_ITERATOR>
+    template<concepts::orbit_iterator ORBIT_ITERATOR>
     using command_t = typename ORBIT_ITERATOR::value_type::command_type;
 				   
-    template<specs::orbit_iterator ORBIT_ITERATOR>
+    template<concepts::orbit_iterator ORBIT_ITERATOR>
     using report_t = typename ORBIT_ITERATOR::value_type::report_type;
 
 
     // This is for iterating on system transitions.
-    template<specs::orbit_iterator ORBIT_ITERATOR,
+    template<concepts::orbit_iterator ORBIT_ITERATOR,
 	     typename ORBIT_SENTINEL>
     struct transition {
       

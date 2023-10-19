@@ -85,14 +85,14 @@ public:
 };
 
 // Let us check that our controller satisfies the appropriate concept.
-static_assert(gdyn::specs::controller<adaptive_controller,
+static_assert(gdyn::concepts::controller<adaptive_controller,
 	      Bonobo::observation_type, Bonobo::command_type>);
 
 
 // Our adaptive controller is greedy, it takes the best action it
 // knows for a given observation. Let us set up an epsilon-greedy
 // adaptor.
-template<gdyn::specs::controller<Bonobo::observation_type, Bonobo::command_type> CONTROLLER,
+template<gdyn::concepts::controller<Bonobo::observation_type, Bonobo::command_type> CONTROLLER,
 	 typename RANDOM_GENERATOR>
 auto epsilon_greedy(RANDOM_GENERATOR& gen, double epsilon, const CONTROLLER& controller) {
   return [&gen, &controller, epsilon](const auto& observation) {

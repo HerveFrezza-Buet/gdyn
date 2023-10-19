@@ -26,7 +26,7 @@ limitations under the License.
 
 
 namespace gdyn {
-  namespace specs {
+  namespace concepts {
 
 
     /**

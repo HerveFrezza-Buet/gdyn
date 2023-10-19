@@ -22,7 +22,7 @@ limitations under the License.
 #include <ranges>
 #include <tuple>
 
-#include <gdynSpecs.hpp>
+#include <gdynConcepts.hpp>
 #include <gdynIterators.hpp>
 
 // Inspired from
@@ -76,8 +76,8 @@ namespace gdyn {
      * This provides a command from a controller, i.e. a function that
      * computes a command from the current system observation.
      */
-    template<specs::system SYSTEM,
-	     specs::controller<typename SYSTEM::observation_type, typename SYSTEM::command_type> CONTROLLER>
+    template<concepts::system SYSTEM,
+	     concepts::controller<typename SYSTEM::observation_type, typename SYSTEM::command_type> CONTROLLER>
     auto controller(SYSTEM& system, const CONTROLLER& controller) {return tick([&system, controller](){return controller(*system);});}
     
     
@@ -107,9 +107,9 @@ namespace gdyn {
      * current state.
      */
     template<std::ranges::input_range R,
-	     specs::system SYSTEM>
+	     concepts::system SYSTEM>
     requires std::ranges::view<R> &&
-    specs::command_iterator<std::ranges::iterator_t<R>, typename SYSTEM::command_type>
+    concepts::command_iterator<std::ranges::iterator_t<R>, typename SYSTEM::command_type>
     class orbit_view : public std::ranges::view_interface<orbit_view<R, SYSTEM>> {
     private:
       // from is the range we adapt to become an orbit.
@@ -202,7 +202,7 @@ namespace gdyn {
      */
     template<std::ranges::input_range R>
     requires std::ranges::view<R> &&
-    specs::orbit_iterator<std::ranges::iterator_t<R>>
+    concepts::orbit_iterator<std::ranges::iterator_t<R>>
     class transition_view : public std::ranges::view_interface<transition_view<R>> {
     private:
       R from {};

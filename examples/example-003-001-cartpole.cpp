@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
   // make system with default parameters
   auto simulator = gdyn::problem::cartpole::make();
   // Let us check the type requirements for our simulator.
-  static_assert(gdyn::specs::system<decltype(simulator)>);
+  static_assert(gdyn::concepts::system<decltype(simulator)>);
   
   simulator = gdyn::problem::cartpole::random_state(gen, simulator.param); // We set the state.
   auto obs = *simulator;          // We get the observation.

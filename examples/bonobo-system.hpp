@@ -19,7 +19,7 @@
 // palindrom, 100 if the word is 'BONOBO', 0 otherwise.  A palindrom
 // is a terminal state of the simulation.
 
-// This class fits the ds::specs::Simulator concept, and adds some
+// This class fits the gdyn::concepts::Simulator concept, and adds some
 // usefull features, specific to the BONOBO simulation.
 
 #define bonoboPALINDROM_REWARD   -10
@@ -29,7 +29,7 @@ public:
   
   enum class letter : char {B = 'B', O = 'O', N = 'N'};
 
-  // This is required by the gdyn::specs::system concept.
+  // This is required by the gdyn::concepts::system concept.
   using observation_type = std::string;
   using command_type     = letter;
   using state_type       = std::array<command_type, 6>;
@@ -99,7 +99,7 @@ private:
 public:
   
 
-  // This is required by the gdyn::specs::system concept.
+  // This is required by the gdyn::concepts::system concept.
   // This is for initializing the state of the system.
   Bonobo& operator=(const state_type& init_state) {
     state = init_state;
@@ -107,20 +107,20 @@ public:
     return *this;
   }
   
-  // This is required by the gdyn::specs::system concept.
+  // This is required by the gdyn::concepts::system concept.
   // This returns the obsrvation corresponding to the system's state.
   observation_type operator*() const {
     return to_string(state);
   }
 
-  // This is required by the gdyn::specs::system concept.
+  // This is required by the gdyn::concepts::system concept.
   // This it true if the system is not in a terminal state.
   operator bool() const {
     return !terminal_state();
   }
 
   
-  // This is required by the gdyn::specs::system concept.
+  // This is required by the gdyn::concepts::system concept.
   // This performs a state transition.
   report_type operator()(command_type command) {
     if(*this) { // If we are not in a terminal state
@@ -135,7 +135,7 @@ public:
 };
 
 // Let us check the ds concept.
-static_assert(gdyn::specs::system<Bonobo>);
+static_assert(gdyn::concepts::system<Bonobo>);
 
 // Here are some usefull prints
 

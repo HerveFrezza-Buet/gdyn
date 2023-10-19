@@ -36,8 +36,8 @@ int main(int argc, char *argv[]) {
   auto simulator = cheese_maze::make_environment(param, gen);
 
   // Let us check the type requirements for our simulator.
-  static_assert(gdyn::specs::system<decltype(simulator)>);
-  static_assert(gdyn::specs::transparent_system<decltype(simulator)>);
+  static_assert(gdyn::concepts::system<decltype(simulator)>);
+  static_assert(gdyn::concepts::transparent_system<decltype(simulator)>);
 
   state = cheese_maze::random_state(gen); 
   simulator = state; // We set the state, by an extra 'out of concept' function.
@@ -61,9 +61,9 @@ int main(int argc, char *argv[]) {
 
   auto exposed_simulator = gdyn::system::make_exposed(simulator);
   
-  static_assert(gdyn::specs::system<decltype(exposed_simulator)>);
+  static_assert(gdyn::concepts::system<decltype(exposed_simulator)>);
   // but exposed_simulator is no more a transparent_system.
-  // static_assert(gdyn::specs::transparent_system<decltype(exposed_simulator)>);
+  // static_assert(gdyn::concepts::transparent_system<decltype(exposed_simulator)>);
   
   state = cheese_maze::random_state(gen); 
   simulator = state; // We set the state (to exposed simulator as well, since it owns a reference on simulator).

@@ -17,7 +17,7 @@ auto control_policy(const Bonobo::observation_type& observation) {
 }
 
 // Let us check that it fits the appropriate concept.
-static_assert(gdyn::specs::controller<decltype(control_policy), Bonobo::observation_type, Bonobo::command_type>);
+static_assert(gdyn::concepts::controller<decltype(control_policy), Bonobo::observation_type, Bonobo::command_type>);
 
 int main(int argc, char* argv[]) {
   std::random_device rd;

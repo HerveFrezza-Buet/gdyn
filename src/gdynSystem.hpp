@@ -20,7 +20,7 @@ limitations under the License.
 #pragma once
 
 
-#include <gdynSpecs.hpp>
+#include <gdynConcepts.hpp>
 
 
 namespace gdyn {
@@ -31,7 +31,7 @@ namespace gdyn {
   struct no_report {};
   
   namespace system {
-    template<specs::transparent_system BASE_SYSTEM>
+    template<concepts::transparent_system BASE_SYSTEM>
     class exposed {
       BASE_SYSTEM& base_system;
     public:
@@ -49,7 +49,7 @@ namespace gdyn {
       operator bool() const                            {return base_system;}  
     };
 
-    template<specs::transparent_system BASE_SYSTEM>
+    template<concepts::transparent_system BASE_SYSTEM>
     auto make_exposed(BASE_SYSTEM& base_system) {return exposed<BASE_SYSTEM>(base_system);}
     
   }

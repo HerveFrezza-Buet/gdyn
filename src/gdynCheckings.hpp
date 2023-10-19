@@ -26,7 +26,7 @@ limitations under the License.
 #include <ranges>
 #include <vector>
 
-#include <gdynSpecs.hpp>
+#include <gdynConcepts.hpp>
 #include <gdynIterators.hpp>
 #include <gdynRanges.hpp>
 #include <gdynSystem.hpp>
@@ -48,7 +48,7 @@ namespace gdyn {
       report_type operator()(command_type command) {return 0.;}
       operator bool() const {return true;} 
     };
-    static_assert(specs::system<system_type>);
+    static_assert(concepts::system<system_type>);
 
     
     // Transparent System
@@ -66,9 +66,9 @@ namespace gdyn {
       report_type operator()(command_type command) {return 0.;}
       operator bool() const {return true;} 
     };
-    static_assert(specs::transparent_system<transparent_system_type>);
-    static_assert(specs::system<transparent_system_type>);
-    static_assert(specs::system<system::exposed<transparent_system_type>>);
+    static_assert(concepts::transparent_system<transparent_system_type>);
+    static_assert(concepts::system<transparent_system_type>);
+    static_assert(concepts::system<system::exposed<transparent_system_type>>);
 
     
 
@@ -78,7 +78,7 @@ namespace gdyn {
     
     inline double controller(int) {return 0;}
     using controller_type = decltype(controller);
-    static_assert(specs::controller<controller_type, system_type::observation_type, system_type::command_type>);
+    static_assert(concepts::controller<controller_type, system_type::observation_type, system_type::command_type>);
 
     
     // Tick
@@ -104,7 +104,7 @@ namespace gdyn {
     using orbit_type = decltype(std::declval<tick_type>() | views::orbit(std::declval<system_type&>()));
     using orbit_iterator_type = std::ranges::iterator_t<orbit_type>;
     static_assert(std::ranges::input_range<orbit_type>);
-    static_assert(specs::orbit_iterator<orbit_iterator_type>);
+    static_assert(concepts::orbit_iterator<orbit_iterator_type>);
 
   }
 }
