@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(gdyn) 
 
+SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 SET(PACKAGE_VERSION "1.00")
 SET(PACKAGE_LICENSE "Apache")
 SET(PROJECT_DESCRIPTION_SUMMARY "gdyn is for generic C++ dynamical system design")
