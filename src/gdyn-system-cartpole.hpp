@@ -57,7 +57,7 @@ namespace gdyn {
 	double theta_dot;
       };
     
-      static std::string to_string(const state& s) {
+      inline std::string to_string(const state& s) {
 	std::stringstream sbuf;
 	sbuf << "x=" << s.x << " x_dot=" << s.x_dot;
 	sbuf << " theta=" << s.theta << " theta_dot=" << s.theta_dot;

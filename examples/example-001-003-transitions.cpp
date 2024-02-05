@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
 
   step = 1;
   for(const auto& t 
-	: gdyn::ranges::tick([&gen](){return Bonobo::random_command(gen);}) // We generate random command.
+	: gdyn::views::pulse([&gen](){return Bonobo::random_command(gen);}) // We generate random command.
 	| gdyn::views::orbit(simulator)                                     // They feed an orbit.
 	| std::views::take(20)                                              // We take ato modt 20 orbit points.
 	| gdyn::views::transition)                                          // We gather them into transitions.
@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
   std::vector<gdyn::transition<Bonobo::observation_type, Bonobo::command_type, Bonobo::report_type>> transitions_dataset;
   for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit) {
     simulator = Bonobo::random_state(gen);
-    std::ranges::copy(gdyn::ranges::tick([&gen](){return Bonobo::random_command(gen);}) // We generate random command.
+    std::ranges::copy(gdyn::views::pulse([&gen](){return Bonobo::random_command(gen);}) // We generate random command.
 		      | gdyn::views::orbit(simulator)                                   // They feed an orbit until system termination.
 		      | gdyn::views::transition,                                        // We gather orbit points into transitions.
 		      std::back_inserter(transitions_dataset));                         // We store the result in the dataset.

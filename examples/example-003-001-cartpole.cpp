@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
   // a command. Here, f is a lambda calling random_command.
   std::cout << "Random command source" << std::endl;
   for(auto command
-	: gdyn::ranges::tick([&gen](){return gdyn::problem::cartpole::random_command(gen);})
+	: gdyn::views::pulse([&gen](){return gdyn::problem::cartpole::random_command(gen);})
 	| std::views::take(20))
     std::cout << command << std::endl;
 
@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
   print_context("start", obs, 0);
 
   for(auto command
-        : gdyn::ranges::tick([&simulator, &policy](){return policy(*simulator);})
+        : gdyn::views::pulse([&simulator, &policy](){return policy(*simulator);})
         | std::views::take(20)) {
     reward = simulator(command); // We apply the command to the system to trigger a state transition.
     obs = *simulator;

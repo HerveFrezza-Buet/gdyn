@@ -38,9 +38,9 @@ namespace gdyn {
     struct terminal_t {};
     inline constexpr terminal_t terminal {};
 
-    // iterator for the tick view
+    // iterator for the pulse view
     template<std::regular_invocable F>
-    struct tick {
+    struct pulse {
       using stored_function_type = std::function<decltype(std::declval<F>()()) ()>;
       using value_type = decltype(std::declval<F>()());
 	
@@ -52,13 +52,13 @@ namespace gdyn {
       
     public:
       
-      tick()                       = delete;
-      tick(const tick&)            = default;
-      tick& operator=(const tick&) = default;
-      tick(tick&&)                 = default;
-      tick& operator=(tick&&)      = default;
+      pulse()                       = delete;
+      pulse(const pulse&)            = default;
+      pulse& operator=(const pulse&) = default;
+      pulse(pulse&&)                 = default;
+      pulse& operator=(pulse&&)      = default;
 	
-      tick(const F& f) : f(f), value(f()) {}
+      pulse(const F& f) : f(f), value(f()) {}
 	
       auto& operator++()   {value = f(); return *this;}
       auto operator++(int) {auto res = *this; ++(*this); return res;}

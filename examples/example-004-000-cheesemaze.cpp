@@ -14,7 +14,7 @@ template<typename SIMULATOR, typename GEN>
 void orbit(SIMULATOR& sim, GEN& gen) {
   unsigned int step = 1;
   for(auto [obs_or_state, command, report]
-        : gdyn::ranges::tick([&gen](){return cheese_maze::random_command(gen);})
+        : gdyn::views::pulse([&gen](){return cheese_maze::random_command(gen);})
         | gdyn::views::orbit(sim)
         | std::views::take(10)) {
     // print_orbit_point increments 'step'

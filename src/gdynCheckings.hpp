@@ -81,27 +81,27 @@ namespace gdyn {
     static_assert(concepts::controller<controller_type, system_type::observation_type, system_type::command_type>);
 
     
-    // Tick
-    // ----
+    // Pulse
+    // -----
     
-    using tick_type = ranges::tick<std::function<int ()>>;
-    using tick_iterator_type = std::ranges::iterator_t<tick_type>;
-    static_assert(std::ranges::range<tick_type>);
-    static_assert(std::ranges::input_range<tick_type>);
+    using pulse_type = views::pulse<std::function<int ()>>;
+    using pulse_iterator_type = std::ranges::iterator_t<pulse_type>;
+    static_assert(std::ranges::range<pulse_type>);
+    static_assert(std::ranges::input_range<pulse_type>);
 
-    using T = tick_type;
-    static_assert(std::ranges::enable_view<tick_type>);
-    static_assert(std::ranges::view<tick_type>);
-    static_assert(std::ranges::viewable_range<tick_type>);
+    using T = pulse_type;
+    static_assert(std::ranges::enable_view<pulse_type>);
+    static_assert(std::ranges::view<pulse_type>);
+    static_assert(std::ranges::viewable_range<pulse_type>);
 
     
-    static_assert(std::input_iterator<tick_iterator_type>);
+    static_assert(std::input_iterator<pulse_iterator_type>);
 
     
     // Orbit
     // -----
 
-    using orbit_type = decltype(std::declval<tick_type>() | views::orbit(std::declval<system_type&>()));
+    using orbit_type = decltype(std::declval<pulse_type>() | views::orbit(std::declval<system_type&>()));
     using orbit_iterator_type = std::ranges::iterator_t<orbit_type>;
     static_assert(std::ranges::input_range<orbit_type>);
     static_assert(concepts::orbit_iterator<orbit_iterator_type>);

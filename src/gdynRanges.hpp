@@ -1,18 +1,18 @@
 /*
 
-Copyright 2023 Herve FREZZA-BUET, Alain DUTECH
+  Copyright 2023 Herve FREZZA-BUET, Alain DUTECH
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
 */
 
@@ -31,38 +31,40 @@ limitations under the License.
 
 namespace gdyn {
   namespace ranges  {
+    namespace views {
 
-    // ########
-    // #      #
-    // # Tick #
-    // #      #
-    // ########
+      // #########
+      // #       #
+      // # Pulse #
+      // #       #
+      // #########
 
-    /**
-     * This range calls a function f() forever, the iterator provides
-     * successive results of these calls.
-     */
-    template<std::regular_invocable F>
-    class tick : public std::ranges::view_interface<tick<F>> {
-    private:
-      using stored_function_type = std::function<decltype(std::declval<F>()()) ()>;
-      stored_function_type f;
-    public:
+      /**
+       * This range calls a function f() forever, the iterator provides
+       * successive results of these calls.
+       */
+      template<std::regular_invocable F>
+      class pulse : public std::ranges::view_interface<pulse<F>> {
+      private:
+	using stored_function_type = std::function<decltype(std::declval<F>()()) ()>;
+	stored_function_type f;
+      public:
 
-      tick()                       = delete;
-      tick(const tick&)            = default;
-      tick& operator=(const tick&) = default;
-      tick(tick&&)                 = default;
-      tick& operator=(tick&&)      = default;
+	pulse()                       = delete;
+	pulse(const pulse&)            = default;
+	pulse& operator=(const pulse&) = default;
+	pulse(pulse&&)                 = default;
+	pulse& operator=(pulse&&)      = default;
 	
-      tick(const F& f) : f(f) {}
+	pulse(const F& f) : f(f) {}
 
-      constexpr auto begin() const {return iterators::tick<stored_function_type>(f);}
-      constexpr auto end()   const {return iterators::terminal;} // unreachable.
+	constexpr auto begin() const {return iterators::pulse<stored_function_type>(f);}
+	constexpr auto end()   const {return iterators::terminal;} // unreachable.
       
-      template<typename CLOSURE>
-      constexpr auto operator|(const CLOSURE& closure) const {return closure(*this);}
-    };
+	template<typename CLOSURE>
+	constexpr auto operator|(const CLOSURE& closure) const {return closure(*this);}
+      };
+    }
 
     
     // ##############
@@ -78,7 +80,7 @@ namespace gdyn {
      */
     template<concepts::system SYSTEM,
 	     concepts::controller<typename SYSTEM::observation_type, typename SYSTEM::command_type> CONTROLLER>
-    auto controller(SYSTEM& system, const CONTROLLER& controller) {return tick([&system, controller](){return controller(*system);});}
+    auto controller(SYSTEM& system, const CONTROLLER& controller) {return views::pulse([&system, controller](){return controller(*system);});}
     
     
     // #########
