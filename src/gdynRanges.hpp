@@ -177,7 +177,7 @@ namespace gdyn {
 	constexpr auto operator()(SYSTEM& system) {return orbit_range_adaptor_closure<SYSTEM>(system);}
       };
 
-      // The point here, is that expression A|B must buid B(A). Our
+      // The point here, is that expression A|B must build B(A). Our
       // orbit adaptor plays the role of B. So what should be passed
       // as B in A|B is something that must only take the system, and
       // be ready for receiving only A for builo,g a full orbit. This
