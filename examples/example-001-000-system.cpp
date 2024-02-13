@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
   print_current(state, reward);
   std::cout << std::endl;
 
-  // We can use command sources in order to feed the system. The tick
+  // We can use command sources in order to feed the system. The pulse
   // range enables this. It repeats calls of a function f() that produces
   // a command. Here, f is a lambda calling random_command.
   std::cout << "Random command source" << std::endl;
