@@ -114,7 +114,7 @@ int main(int argc, char* argv[]) {
     unsigned int step = 0;
     simulator = Bonobo::random_state(gen);
     for([[maybe_unused]] auto& unused
-	  : gdyn::ranges::controller(simulator, epsilon_greedy(gen, .1, greedy_controller))                              // We use the controller to feed an orbit.
+	  : gdyn::views::controller(simulator, epsilon_greedy(gen, .1, greedy_controller))                               // We use the controller to feed an orbit.
 	  | gdyn::views::orbit(simulator)                                                                                // This is the orbit.
 	  | gdyn::views::transition                                                                                      // We collect transitions.
 	  | std::views::filter([&greedy_controller](const auto& sample){greedy_controller.learn(sample); return true;})) // We use the transitions to update the controller.

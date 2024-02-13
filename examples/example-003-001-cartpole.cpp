@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
   print_context("start", obs, 0);
 
   for(auto command
-        : gdyn::views::pulse([&simulator, &policy](){return policy(*simulator);})
+        : gdyn::views::controller(simulator, policy)
         | std::views::take(20)) {
     reward = simulator(command); // We apply the command to the system to trigger a state transition.
     obs = *simulator;

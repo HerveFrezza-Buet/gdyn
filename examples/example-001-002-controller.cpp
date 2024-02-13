@@ -32,9 +32,9 @@ int main(int argc, char* argv[]) {
   
   step = 1;
   for(auto [observation, action, report] 
-	: gdyn::ranges::controller(simulator, control_policy)  // We generate commands from a controller on the current state.
-	| gdyn::views::orbit(simulator)                        // It feeds an orbit.
-	| std::views::take(20))                                // We take at most 20 orbit points.
+	: gdyn::views::controller(simulator, control_policy)  // We generate commands from a controller on the current state.
+	| gdyn::views::orbit(simulator)                       // It feeds an orbit.
+	| std::views::take(20))                               // We take at most 20 orbit points.
     print_orbit_point(observation, action, report, step);
   
   state = *simulator; // We get the observation.

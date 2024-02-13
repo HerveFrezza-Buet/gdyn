@@ -64,24 +64,24 @@ namespace gdyn {
 	template<typename CLOSURE>
 	constexpr auto operator|(const CLOSURE& closure) const {return closure(*this);}
       };
+
+    
+      // ##############
+      // #            #
+      // # Controller #
+      // #            #
+      // ##############
+
+
+      /**
+       * This provides a command from a controller, i.e. a function that
+       * computes a command from the current system observation.
+       */
+      template<concepts::system SYSTEM,
+	       concepts::controller<typename SYSTEM::observation_type, typename SYSTEM::command_type> CONTROLLER>
+      auto controller(SYSTEM& system, const CONTROLLER& controller) {return views::pulse([&system, controller](){return controller(*system);});}
+    
     }
-
-    
-    // ##############
-    // #            #
-    // # Controller #
-    // #            #
-    // ##############
-
-
-    /**
-     * This provides a command from a controller, i.e. a function that
-     * computes a command from the current system observation.
-     */
-    template<concepts::system SYSTEM,
-	     concepts::controller<typename SYSTEM::observation_type, typename SYSTEM::command_type> CONTROLLER>
-    auto controller(SYSTEM& system, const CONTROLLER& controller) {return views::pulse([&system, controller](){return controller(*system);});}
-    
     
     // #########
     // #       #
