@@ -58,7 +58,8 @@ namespace gdyn {
       pulse(pulse&&)                 = default;
       pulse& operator=(pulse&&)      = default;
 	
-      pulse(const F& f) : f(f), value(f()) {}
+      pulse(const F& f) : f(f), value(this->f()) {
+      }
 	
       auto& operator++()   {value = f(); return *this;}
       auto operator++(int) {auto res = *this; ++(*this); return res;}
