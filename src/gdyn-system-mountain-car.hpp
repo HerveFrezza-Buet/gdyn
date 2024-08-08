@@ -29,16 +29,15 @@ struct parameters {
 struct state {
   double position;
   double velocity;
+
+  operator std::string() const { // Cast to string
+    return std::string("{pos=")+std::to_string(position)+", vel="+std::to_string(velocity)+"}";
+  }
 }; // struct state
 
-inline std::string to_string(const state& s) {
-  std::stringstream sbuf;
-  sbuf << "pos" << s.position << " vel=" << s.velocity;
-  return sbuf.str();
-}
 
 inline std::ostream& operator<<(std::ostream& os, state s) {
-  return os << "state='" << to_string(s) << "'";
+  return os << static_cast<std::string>(s);
 }
 
 template<typename RANDOM_GENERATOR>
