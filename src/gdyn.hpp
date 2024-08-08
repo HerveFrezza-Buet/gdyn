@@ -25,6 +25,7 @@ limitations under the License.
 #include <gdynRanges.hpp>
 #include <gdynTransition.hpp>
 
+#include <gdyn-system-grid-world.hpp>
 #include <gdyn-system-cartpole.hpp>
 
 /**
