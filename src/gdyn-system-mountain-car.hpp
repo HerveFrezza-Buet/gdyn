@@ -44,10 +44,10 @@ template<typename RANDOM_GENERATOR>
 state random_state(RANDOM_GENERATOR& gen, const parameters& param) {
   state res;
   double pos_range = param.start_position_max - param.start_position_min;
-  res.position = (std::uniform_real_distribution<double>(0,1)(gen) * 2.0 - 1.0) * pos_range + param.start_position_min;
+  res.position = std::uniform_real_distribution<double>(0,1)(gen) * pos_range + param.start_position_min;
 
   double vel_range = param.start_velocity_max - param.start_velocity_min;
-  res.velocity = (std::uniform_real_distribution<double>(0,1)(gen) * 2.0 - 1.0) * vel_range + param.start_velocity_min;
+  res.velocity = std::uniform_real_distribution<double>(0,1)(gen) * vel_range + param.start_velocity_min;
 
   return res;
 }
