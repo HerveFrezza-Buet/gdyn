@@ -73,7 +73,8 @@ namespace gdyn {
      */
     template<typename CONTROLLER, typename OBSERVATION, typename COMMAND>
     concept controller =
-      requires(CONTROLLER const constant_controller,
+    std::invocable<CONTROLLER, OBSERVATION>
+      && requires(CONTROLLER const constant_controller,
 	       OBSERVATION const constant_observation) {
       {constant_controller(constant_observation)} -> std::convertible_to<COMMAND>;
     };
