@@ -67,14 +67,35 @@ A system evolves by performing successive transitions. This realizes a "path" in
 - command_n+1
 - ...
 
-It is convenient to represent a single `orbit_point` as $`(\mathrm{observation}_n, \mathrm{report}_n, \mathrm{command}_{n+1})`$.
+It is convenient to represent a single `orbit_point` as $`(\mathrm{observation}_n, \mathrm{report}_n, \mathrm{command}_{n+1})`$. Beware of the $`n+1`$ index of the command part !
+
+### Controllers
+
+Driving a dynamical system requires to be able to provide the next command for performing the next transition. Usually (but not necessarily), this command is determined by the current observation. In this case, we can set up a function that actually computes a command from an observation. This is what is called a `controller` in gdyn.
+
+Leveraging on C++ ranges, generating orbits can be nicely written:
 
 
-command2triplets observation-command-report. These triplets are called `orbit_point`s in gdyn.
-So an orbit is:
-- observation1-command1-report1  (we have reached state 2 at this point)
-- observation2-command2-report2  (we have reached state 3 at this point)
-- ...
+```cpp
+auto sys = some_function_making_a_dynamical_system();
+
+auto controller(const observation& obs) {....; return command;}
+
+sys = init_state;
+for(auto [obs, com, rep] // i.e. obs_n, command_{n+1}, report_n
+    : gdyn::views::controller(sys, controller) // This is a source of commands, here obtained from the controller.
+    | gdyn::views::orbit(sys)) {               // This is where the [obs, com, rep] triplet is made.
+    // here is the code for each orbit point.
+    // Nota: this loops end when a terminal state is reached.
+    // Nota: com is a std::option<command>, since there is no next command for the terminal state.
+    // Nota: rep is a std::option<report>, since first iteration is at initial state, and we have no previous transition to be reported.
+}    
+```
+
+## Toy dynamical systems
+
+There are several systems defined in gdyn, that can be used for testing. These are define inside the `gdyn::problem::` namespace.
+
 
 
 
