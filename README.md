@@ -67,7 +67,7 @@ A system evolves by performing successive transitions. This realizes a "path" in
 - command_n+1
 - ...
 
-It is convenient to represent a single `orbit_point` as $(\mathrm{observation}_n, \mathrm{report}_n, \mathrm{command}_{n+1})$.
+It is convenient to represent a single `orbit_point` as $`(\mathrm{observation}_n, \mathrm{report}_n, \mathrm{command}_{n+1})`$.
 
 
 command2triplets observation-command-report. These triplets are called `orbit_point`s in gdyn.
