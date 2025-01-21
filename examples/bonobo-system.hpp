@@ -16,8 +16,8 @@
 // letter). Observation is the word itslef. When transition occurs, we
 // get a reward. Indeed, this reward can be viewed as a report of the
 // transition execution. This reward is -10 if the word is a
-// palindrom, 100 if the word is 'BONOBO', 0 otherwise.  A palindrom
-// is a terminal state of the simulation.
+// palindrom, 100 if the word is 'BONOBO', 0 otherwise. 'BONOBO' is a
+// terminal state.
 
 // This class fits the gdyn::concepts::Simulator concept, and adds some
 // usefull features, specific to the BONOBO simulation.
