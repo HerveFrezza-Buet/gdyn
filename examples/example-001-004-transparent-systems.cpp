@@ -19,7 +19,7 @@ struct circle_system {
   
   observation_type operator*() const {
     if(auto ct = std::cos(theta); ct > 0.7071) return orientation::Right;
-    else if(ct < 0.7071)                       return orientation::Left;
+    else if(ct < -0.7071)                      return orientation::Left;
     if(std::sin(theta) > 0.7071) return orientation::Up;
     return orientation::Down;
   }
@@ -48,6 +48,29 @@ int main(int argc, char *argv[]) {
 	| std::views::take(20))
     std::cout << observation << std::endl;
     
+  std::cout << std::endl
+	    << "The exposed system" << std::endl
+	    << "------------------" << std::endl
+	    << std::endl;
+  auto exposed_simulator = gdyn::system::make_exposed(simulator);
+  for(auto [state, action, report] 
+	: gdyn::views::pulse([](){return dTHETA;}) 
+	| gdyn::views::orbit(exposed_simulator)        
+	| std::views::take(20))
+    std::cout << state << std::endl;
+  
+  std::cout << std::endl
+	    << "The detailed system" << std::endl
+	    << "------------------" << std::endl
+	    << std::endl;
+  auto detailed_simulator = gdyn::system::make_detailed(simulator);
+  for(auto [state_observation, action, report] 
+	: gdyn::views::pulse([](){return dTHETA;}) 
+	| gdyn::views::orbit(detailed_simulator)        
+	| std::views::take(20)) {
+    auto [state, observation] = state_observation;
+    std::cout << state << ", " << observation << std::endl;
+  }
 
 
   return 0;

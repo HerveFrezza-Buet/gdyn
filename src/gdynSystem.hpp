@@ -19,7 +19,7 @@ limitations under the License.
 
 #pragma once
 
-
+#include <tuple>
 #include <gdynConcepts.hpp>
 
 
@@ -49,8 +49,35 @@ namespace gdyn {
       operator bool() const                            {return base_system;}  
     };
 
+    /**
+     * This wraps a system so that its observation is its actual state.
+     */
     template<concepts::transparent_system BASE_SYSTEM>
     auto make_exposed(BASE_SYSTEM& base_system) {return exposed<BASE_SYSTEM>(base_system);}
+
     
+    template<concepts::transparent_system BASE_SYSTEM>
+    class detailed {
+      BASE_SYSTEM& base_system;
+    public:
+      
+      using observation_type = std::tuple<typename BASE_SYSTEM::state_type, typename BASE_SYSTEM::observation_type>;
+      using command_type     = typename BASE_SYSTEM::command_type;
+      using state_type       = typename BASE_SYSTEM::state_type;
+      using report_type      = typename BASE_SYSTEM::report_type;
+
+      detailed(BASE_SYSTEM& base_system) : base_system(base_system) {}
+      
+      detailed& operator=(const state_type& init_state) {base_system = init_state; return *this;}
+      observation_type operator*() const               {return {base_system.state(), *base_system};}
+      report_type operator()(command_type command)     {return base_system(command);}
+      operator bool() const                            {return base_system;}  
+    };
+
+    /**
+     * This wraps a system so that its observation is its actual state and the observation of the wrapped system.
+     */
+    template<concepts::transparent_system BASE_SYSTEM>
+    auto make_detailed(BASE_SYSTEM& base_system) {return detailed<BASE_SYSTEM>(base_system);}
   }
 }
