@@ -35,6 +35,7 @@ limitations under the License.
  * @example example-001-001-orbit.cpp
  * @example example-001-002-controller.cpp
  * @example example-001-003-transitions.cpp
+ * @example example-001-004-trnsparent-systems.cpp
  * @example example-002-001-training.cpp
  * @example example-003-001-cartpole.cpp
  * @example example-004-000-cheesemaze.cpp
