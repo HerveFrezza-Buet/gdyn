@@ -14,10 +14,11 @@ namespace gdyn {
   namespace problem {
     namespace rocket {
       struct parameters {
-	double ceiling_height = 1000; // meters (m)
-	double mass           =    1; // kilograms (kg)        
-	double drag_coef      =  .00; // kg / s
-	double gravity        = 9.81; // m / s^2
+	double ceiling_height    = 1000; // meters (m)
+	double mass              =    1; // kilograms (kg)        
+	double drag_coef         =  .00; // kg / s
+	double gravity           = 9.81; // m / s^2
+	double internal_euler_dt = .01; // Used when there is drags, for euler integration.
       };
 
       struct phase {
@@ -41,16 +42,21 @@ namespace gdyn {
 
 	parameters params;
 	state_type internal_state;
-	double alpha, _alpha, beta, gamma, _m;
+	double alpha, _alpha, _m, _dc, mg;
 	bool drag_mode;
 	
 	void set_constants() {
 	  drag_mode = params.drag_coef != 0.;
 	  if(drag_mode) {
-	    alpha = params.mass / params.drag_coef;
-	    _alpha = params.drag_coef / params.mass;
-	    beta = 1 / params.drag_coef;
-	    gamma = params.mass * params.gravity / params.drag_coef;
+	    // I encounter numerical issues... I use Euler when there is a drag.
+	    
+	    // alpha  = params.mass / params.drag_coef;
+	    // _alpha = params.drag_coef / params.mass;
+	    // mg     = params.mass * params.gravity;
+	    // _dc    = 1 / params.drag_coef;
+	    
+	    mg = params.mass * params.gravity;
+	    _m = 1 / params.mass;
 	  }
 	  else {
 	    _m = 1 / params.mass;
@@ -83,14 +89,22 @@ namespace gdyn {
 	report_type operator()(command_type command) {
 	  if(!(*this)) return {};
 	  if(drag_mode) {
-	    double delta = gamma - command.value * beta;
-	    double epsilon = internal_state.speed + delta;
-	    double zeta = epsilon * _alpha;
-	    double exp_alpha_t = std::exp(-alpha * command.duration);
-	    internal_state.speed = epsilon*exp_alpha_t - delta;
-	    internal_state.height += zeta * (1 - exp_alpha_t) - delta * command.duration;
+	    // I encounter numerical issues... I use Euler when there is a drag.
+	    
+	    // double delta = (command.value - mg) * _dc;
+	    // double A = internal_state.speed - delta;
+	    // double exp_alpha_t = std::exp(-alpha * command.duration);
+	    // internal_state.speed = A*exp_alpha_t + delta;
+	    // internal_state.height += A * (1 - exp_alpha_t) * _alpha * (1 - exp_alpha_t) + delta * command.duration;
+	    double a = command.value * _m  - params.gravity;
+	    for(double t = params.internal_euler_dt; t <= command.duration; t += params.internal_euler_dt) {
+	      double aa = a - params.drag_coef * internal_state.speed;
+	      internal_state.speed  += aa * params.internal_euler_dt;
+	      internal_state.height += internal_state.speed * params.internal_euler_dt;
+	    }
 	  }
 	  else {
+	    // We do not use Euler here
 	    double v0 = internal_state.speed;
 	    double coef = -params.gravity + command.value * _m;
 	    internal_state.speed = v0 + coef * command.duration;
