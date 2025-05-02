@@ -28,6 +28,7 @@ limitations under the License.
 #include <gdyn-system-grid-world.hpp>
 #include <gdyn-system-cartpole.hpp>
 #include <gdyn-system-mountain-car.hpp>
+#include <gdyn-system-rocket.hpp>
 
 /**
  * @example bonobo-system.hpp

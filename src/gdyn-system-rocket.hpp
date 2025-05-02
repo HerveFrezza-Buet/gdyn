@@ -28,7 +28,7 @@ namespace gdyn {
       struct thrust {
 	double value    =  0; // Newton
 	double duration = .1; // second
-      }
+      };
 
       struct system {
 	using observation_type = phase;
@@ -40,7 +40,7 @@ namespace gdyn {
       private:
 
 	parameters params;
-	state_type phase;
+	state_type internal_state;
 	double alpha, _alpha, beta, gamma;
 	bool drag_mode;
 	
@@ -48,7 +48,7 @@ namespace gdyn {
 	  drag_mode = params.drag_coef != 0.;
 	  if(drag_mode) {
 	    alpha = params.mass / params.drag_coef;
-	    _alpha = params.drag_coef / params.mass
+	    _alpha = params.drag_coef / params.mass;
 	    beta = 1 / params.drag_coef;
 	    gamma = params.mass * params.gravity / params.drag_coef;
 	  }
@@ -56,7 +56,7 @@ namespace gdyn {
 	
       public:
 
-	system(const parameters& params) : params(params), phase() {
+	system(const parameters& params) : params(params), internal_state() {
 	  set_constants();
 	}
 	
@@ -67,24 +67,24 @@ namespace gdyn {
 	}
 	
 	system& operator=(const state_type& init_state) {
-	  phase = init_state;
+	  internal_state = init_state;
 	  return *this;
 	}
 
-	const state_type& state() const {return phase;}
-	const observation_type& operator*() const {return phase;}
+	const state_type& state() const {return internal_state;}
+	const observation_type& operator*() const {return internal_state;}
 	operator bool() const {
-	  return height >= 0 && height <= params.ceiling;
+	  return internal_state.height >= 0 && internal_state.height <= params.ceiling_height;
 	}
 
 	report_type operator()(command_type command) {
 	  if(!(*this)) return {};
 	  double delta = gamma - command.value * beta;
-	  double epsilon = phase.speed + delta;
+	  double epsilon = internal_state.speed + delta;
 	  double zeta = epsilon * _alpha;
 	  double exp_alpha_t = std::exp(-alpha * command.duration);
-	  phase.speed = epsilon*exp_alpha_t - delta;
-	  phase.height += zeta * (1 - exp_alpha_t);
+	  internal_state.speed = epsilon*exp_alpha_t - delta;
+	  internal_state.height += zeta * (1 - exp_alpha_t);
 	  return {}; 
 	}
       };
