@@ -16,7 +16,7 @@ namespace gdyn {
       struct parameters {
 	double ceiling_height = 1000; // meters (m)
 	double mass           =    1; // kilograms (kg)        
-	double drag_coef      =    1; // kg / s
+	double drag_coef      =  .00; // kg / s
 	double gravity        = 9.81; // m / s^2
       };
 
@@ -41,7 +41,7 @@ namespace gdyn {
 
 	parameters params;
 	state_type internal_state;
-	double alpha, _alpha, beta, gamma;
+	double alpha, _alpha, beta, gamma, _m;
 	bool drag_mode;
 	
 	void set_constants() {
@@ -51,6 +51,9 @@ namespace gdyn {
 	    _alpha = params.drag_coef / params.mass;
 	    beta = 1 / params.drag_coef;
 	    gamma = params.mass * params.gravity / params.drag_coef;
+	  }
+	  else {
+	    _m = 1 / params.mass;
 	  }
 	}
 	
@@ -79,12 +82,20 @@ namespace gdyn {
 
 	report_type operator()(command_type command) {
 	  if(!(*this)) return {};
-	  double delta = gamma - command.value * beta;
-	  double epsilon = internal_state.speed + delta;
-	  double zeta = epsilon * _alpha;
-	  double exp_alpha_t = std::exp(-alpha * command.duration);
-	  internal_state.speed = epsilon*exp_alpha_t - delta;
-	  internal_state.height += zeta * (1 - exp_alpha_t);
+	  if(drag_mode) {
+	    double delta = gamma - command.value * beta;
+	    double epsilon = internal_state.speed + delta;
+	    double zeta = epsilon * _alpha;
+	    double exp_alpha_t = std::exp(-alpha * command.duration);
+	    internal_state.speed = epsilon*exp_alpha_t - delta;
+	    internal_state.height += zeta * (1 - exp_alpha_t) - delta * command.duration;
+	  }
+	  else {
+	    double v0 = internal_state.speed;
+	    double coef = -params.gravity + command.value * _m;
+	    internal_state.speed = v0 + coef * command.duration;
+	    internal_state.height += command.duration * (v0 + .5 * coef * command.duration);
+	  }
 	  return {}; 
 	}
       };

@@ -46,8 +46,8 @@ namespace gdyn {
 	      typename DYNAMICAL_SYSTEM::command_type const constant_command) {
       // Let us require syntactical properties.
       system = constant_state;                                                            // Set the state of the system.
-      {*constant_system} -> std::same_as<typename DYNAMICAL_SYSTEM::observation_type>;    // Get the current observation.
-      {system(constant_command)} -> std::same_as<typename DYNAMICAL_SYSTEM::report_type>; // Performs the transition and get a report (may be gdyn::no_report if nothing needs to be reported).
+      {*constant_system} -> std::convertible_to<const typename DYNAMICAL_SYSTEM::observation_type&>;    // Get the current observation.
+      {system(constant_command)} -> std::convertible_to<const typename DYNAMICAL_SYSTEM::report_type&>; // Performs the transition and get a report (may be gdyn::no_report if nothing needs to be reported).
       {constant_system} -> std::convertible_to<bool>;                                     // false means in terminal state.
     };
 
@@ -61,7 +61,7 @@ namespace gdyn {
       && 
       requires (DYNAMICAL_SYSTEM const constant_system) {
       // Let us require syntactical properties.
-      {constant_system.state()} -> std::same_as<typename DYNAMICAL_SYSTEM::state_type>;   // Get the state of the system.
+      {constant_system.state()} -> std::convertible_to<const typename DYNAMICAL_SYSTEM::state_type&>;   // Get the state of the system.
     };
 
     
