@@ -33,7 +33,8 @@ int main(int argc, char* argv[]) {
     t = 0;
     relative_rocket = {.error = 10, .speed = 0};
     for(auto [observation, action, report]
-	  : gdyn::views::controller(relative_rocket, [up, none](double error){if(error < 0) return up; return none;})
+	  : gdyn::views::controller(relative_rocket,
+				    [up, none](double error){if(error < 0) return up; return none;}) // error is the observation of relative_rocket.
 	  | gdyn::views::orbit(rocket)
 	  | std::views::take(1000)) {
       // We get orbits of rocket, while controlling relative_rocket. So
