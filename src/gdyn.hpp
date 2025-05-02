@@ -41,4 +41,5 @@ limitations under the License.
  * @example example-003-001-cartpole.cpp
  * @example example-004-000-cheesemaze.cpp
  * @example example-005-000-rocket.cpp
+ * @example example-005-001-rocket-relative.cpp
  */
