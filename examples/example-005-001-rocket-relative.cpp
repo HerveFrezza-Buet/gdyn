@@ -15,6 +15,7 @@ int main(int argc, char* argv[]) {
   gdyn::problem::rocket::thrust up   {.value = 20, .duration = DT};
   gdyn::problem::rocket::thrust none {.value =  0, .duration = DT};
 
+  params.drag_coef = .1;
   auto rocket = gdyn::problem::rocket::system(params); // This knows its height and speed.
   double target = 50; // This is the height we would like the rocket to stay at.
   double t;
@@ -40,7 +41,10 @@ int main(int argc, char* argv[]) {
       // We get orbits of rocket, while controlling relative_rocket. So
       // we have access to height and speed, while relative rocket
       // observations are only the current error.
-      datafile << t << ' ' << observation.height << ' ' << observation.speed << std::endl;
+      if(action)
+	datafile << t << ' ' << observation.height << ' ' << observation.speed << ' ' << action->value << std::endl;
+      else
+	datafile << t << ' ' << observation.height << ' ' << observation.speed << ' ' <<             0 << std::endl;
       datatarget << t << ' ' << target << std::endl;
       t += DT;
       if(t > 35) target = 30; // We change the target.
@@ -57,6 +61,7 @@ int main(int argc, char* argv[]) {
 	   << "set trange [0:" << t << ']' << std::endl
 	   << "set parametric" << std::endl
 	   << "plot 'relative-rocket.dat' using 1:2 with lines lc rgb \"black\" title \"rocket height\", \\" << std::endl
+	   << "'relative-rocket.dat' using 1:4 with lines lc rgb \"red\" title \"thrust\", \\" << std::endl
 	   << "'target.dat' using 1:2 with lines lc rgb \"green\" title \"target\"" << std::endl;
   std::cout << std::endl
 	    << "Run : gnuplot -p " << filename << std::endl
