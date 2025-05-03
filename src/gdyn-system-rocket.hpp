@@ -126,7 +126,7 @@ namespace gdyn {
 	  using observation_type = double;
 	  using command_type     = thrust;
 	  using state_type       = phase;
-	  using report_type      = gdyn::no_report;
+	  using report_type      = double; // We report the error (which is also the observation)
 	
 	private:
 
@@ -159,8 +159,7 @@ namespace gdyn {
 	  const observation_type& operator*() const {synchronize_state(); return internal_state.error;}
 	  operator bool() const {return borrowed_system;}
 
-	  report_type operator()(command_type command) {return borrowed_system(command);} // no need to synchronize here, this will be done on demand.
-	  
+	  report_type operator()(command_type command) {borrowed_system(command); return *(*this);} 
 	};
       }
     }
