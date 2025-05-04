@@ -129,12 +129,12 @@ namespace gdyn {
 	  using state_type       = phase;
 	  using report_type      = double; // We report -|error| (considered as a negative reward in case of error)
 
-	  phase convert(const rocket::phase& p) const {
-	    return {.speed = p.speed, .error = p.height - get_target()};
+	  rocket::relative::phase convert(const rocket::phase& p) const {
+	    return {p.height - get_target(), p.speed}; 
 	  }
 	  
-	  rocket::phase convert(const phase& p) const {
-	    return {.speed = p.speed, .height = p.error + get_target()};
+	  rocket::phase convert(const rocket::relative::phase& p) const {
+	    return {p.error + get_target(), p.speed};
 	  }
 						      
 	private:
@@ -144,7 +144,7 @@ namespace gdyn {
 	  mutable state_type internal_state;
 	  
 	  void synchronize_state() const {
-	    internal_state.speed = convert(borrowed_system.state());
+	    internal_state = convert(borrowed_system.state());
 	  }
 
 	public:
