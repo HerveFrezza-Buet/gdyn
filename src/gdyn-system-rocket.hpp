@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <functional>
+#include <iostream>
 
 /*
   This system is a rocket used in an indoor environment: there is a
@@ -126,7 +127,7 @@ namespace gdyn {
 	  using observation_type = double;
 	  using command_type     = thrust;
 	  using state_type       = phase;
-	  using report_type      = double; // We report -error (considered as a negative reward in case of error)
+	  using report_type      = double; // We report -|error| (considered as a negative reward in case of error)
 	
 	private:
 
@@ -159,9 +160,21 @@ namespace gdyn {
 	  const observation_type& operator*() const {synchronize_state(); return internal_state.error;}
 	  operator bool() const {return borrowed_system;}
 
-	  report_type operator()(command_type command) {borrowed_system(command); return -*(*this);} 
+	  report_type operator()(command_type command) {borrowed_system(command); return -std::abs(*(*this));} 
 	};
       }
     }
   }
+}
+
+inline std::ostream& operator<<(std::ostream& os, const gdyn::problem::rocket::phase& p) {
+  return os  << "{height = " << p.height << ", speed = " << p.speed << '}';
+}
+
+inline std::ostream& operator<<(std::ostream& os, const gdyn::problem::rocket::thrust& t) {
+  return os  << "{value = " << t.value << ", dt = " << t.duration << '}';
+}
+
+inline std::ostream& operator<<(std::ostream& os, const gdyn::problem::rocket::relative::phase& p) {
+  return os  << "{error = " << p.error << ", speed = " << p.speed << '}';
 }
