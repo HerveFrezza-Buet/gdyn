@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
 	     << "plot " << END_OF_THRUST << ",t lc rgb \"green\" notitle, \\" << std::endl
 	     << "'rocket-" << mode << "-100ms.dat' using 1:2 with lines lc rgb \"black\" title \"0.1s\", \\" << std::endl
 	     << "'rocket-" << mode << "-1000ms.dat' using 1:2 with points pt 1 ps 2 lc rgb \"blue\" title \"1s\", \\" << std::endl
-	     << "'rocket-" << mode << "-3000ms.dat' using 1:2 with points pt 2 ps 2 lc rgb \"red\" title \"2.5s\"" << std::endl;
+	     << "'rocket-" << mode << "-3000ms.dat' using 1:2 with points pt 2 ps 2 lc rgb \"red\" title \"3s\"" << std::endl;
 
     std::cout << std::endl
 	      << "Run : gnuplot -p " << filename.str() << std::endl

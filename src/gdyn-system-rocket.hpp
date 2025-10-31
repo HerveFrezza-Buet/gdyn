@@ -124,7 +124,7 @@ namespace gdyn {
 	};
 	
 	struct system {
-	  using observation_type = double;
+	  using observation_type = double; // This is the error.
 	  using command_type     = thrust;
 	  using state_type       = phase;
 	  using report_type      = double; // We report -|error| (considered as a negative reward in case of error)

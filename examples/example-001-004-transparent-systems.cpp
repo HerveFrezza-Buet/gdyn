@@ -18,19 +18,19 @@ struct circle_system {
   operator bool() const                                  {return true;}
   
   observation_type operator*() const {
-    if(auto ct = std::cos(theta); ct > 0.7071) return orientation::Right;
-    else if(ct < -0.7071)                      return orientation::Left;
-    if(std::sin(theta) > 0.7071) return orientation::Up;
-    return orientation::Down;
+    if(auto ct = std::cos(theta); ct > std::sqrt(2)/2) return orientation::Right;
+    else if(ct < std::sqrt(2)/2)                       return orientation::Left;
+    if(std::sin(theta) > std::sqrt(2)/2)               return orientation::Up;
+    return                                                    orientation::Down;
   }
 };
 
 std::ostream& operator<<(std::ostream& os, circle_system::orientation o) {
   switch(o) {
-  case circle_system::orientation::Up:   return os << "Up";
-  case circle_system::orientation::Left: return os << "Left";
+  case circle_system::orientation::Up:    return os << "Up";
+  case circle_system::orientation::Left:  return os << "Left";
   case circle_system::orientation::Right: return os << "Right";
-  default: return os << "Down";
+  default:                                return os << "Down";
   }
 }
 
